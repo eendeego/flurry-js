@@ -38,7 +38,7 @@ import type {PresetNumType} from './preset-num';
 import type {FlurryInfo, GlobalInfo} from './types';
 
 import ColorModes from './color-modes';
-import {timeInSecondsSinceStart} from './flurry-c';
+import {currentTime, timeInSecondsSinceStart} from './flurry-c';
 import {DRAW_SPARKS} from './flurry-h';
 import {newFlurryInfo} from './flurry-info';
 import {PresetNum} from './preset-num';
@@ -207,7 +207,7 @@ export function reshapeFlurry(global: GlobalInfo) {
 
 // TODO add physical config argument
 export function initFlurry(global: GlobalInfo, presetStr: ?string) {
-  global.gTimeCounter = Date.now();
+  global.gTimeCounter = currentTime();
 
   global.flurry = null;
 
@@ -362,7 +362,7 @@ export function drawFlurry(global: GlobalInfo): void {
   let deltaFrameTime = 0;
   let alpha;
 
-  const newFrameTime = Date.now();
+  const newFrameTime = currentTime();
   if (global.oldFrameTime === -1) {
     /* special case the first frame -- clear to black */
     alpha = 1.0;
