@@ -510,34 +510,15 @@ function drawSeraphim(
     },
   } = nullthrows(flurry);
 
-  // gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
-  // gl.clearDepth(1.0); // Clear everything
-  // gl.enable(gl.DEPTH_TEST); // Enable depth testing
-  // gl.depthFunc(gl.LEQUAL); // Near things obscure far things
-
-  // Clear the canvas before we start drawing on it.
-
-  // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  /* glDisable(gl.BLEND); */
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
   const [projectionMatrix, modelViewMatrix] = matrixes(gl);
 
   // Tell WebGL how to pull out the positions from the position
   // buffer into the vertexPosition attribute.
   applyVertices(gl, programInfo, seraphimVerticesBuffer, seraphimVertices);
-
-  {
-    let i = 0;
-    for (let j = 0; j < quads; j++) {
-      seraphimTextures[i++] = 0;
-      seraphimTextures[i++] = 0;
-      seraphimTextures[i++] = 0;
-      seraphimTextures[i++] = 0.125;
-      seraphimTextures[i++] = 0.125;
-      seraphimTextures[i++] = 0.125;
-      seraphimTextures[i++] = 0.125;
-      seraphimTextures[i++] = 0;
-    }
-  }
 
   // Tell WebGL how to pull out the positions from the position
   // buffer into the vertexPosition attribute
@@ -578,7 +559,6 @@ function drawSeraphim(
 
   {
     const vertexCount = 6 * quads;
-    // const vertexCount = 12;
     const type = gl.UNSIGNED_SHORT;
     const offset = 0;
     gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);

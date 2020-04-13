@@ -55,7 +55,7 @@ export function newGlobal(
     sys_glWidth: renderingContext.width,
     sys_glHeight: renderingContext.height,
 
-    gTimeCounter: Date.now(),
+    gTimeCounter: Date.now() * 0.001,
     frameCounter: 0,
     oldFrameTime: -1,
 

@@ -279,7 +279,7 @@ export function updateSparkColour(
   }
 
   // cf is unused in original source
-  // const cf =
+  // let cf =
   //   Math.cos(7.0 * (flurry.fTime * rotationsPerSecond)) +
   //   Math.cos(3.0 * (flurry.fTime * rotationsPerSecond)) +
   //   Math.cos(13.0 * (flurry.fTime * rotationsPerSecond));
@@ -342,6 +342,7 @@ export function updateSpark(global: GlobalInfo, flurry: FlurryInfo, s: Spark) {
     } else {
       colorTime = flurry.fTime + flurry.flurryRandomSeed;
     }
+
     baseRed =
       0.109375 * (Math.cos((colorTime + redPhaseShift) * colorRot) + 1.0);
     baseGreen =
@@ -373,6 +374,7 @@ export function updateSpark(global: GlobalInfo, flurry: FlurryInfo, s: Spark) {
   s.color[2] =
     baseBlue +
     0.0625 * (0.5 + Math.cos(37.0 * (thisPointInRadians + thisAngle)));
+
   s.position[0] =
     MAGIC.fieldRange *
     cf *

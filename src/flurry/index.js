@@ -47,41 +47,12 @@ import {drawSpark, updateSpark} from './spark';
 // import {drawSpark, updateSpark, initSparkBuffers} from "./spark";
 import {updateStar} from './star';
 import {makeTexture} from './texture';
+import {init} from '../webgl/init';
 
 export const DEF_PRESET = 'random';
 
 export function GLSetupRC(global: GlobalInfo): void {
-  const gl = global.gl;
-  /* setup the defaults for OpenGL */
-  gl.disable(gl.DEPTH_TEST); // webgl-safe
-  // // TODO
-  // gl.alphaFunc(gl.GREATER, 0.0);
-  // gl.enable(gl.ALPHA_TEST);
-  // gl.shadeModel(gl.FLAT);
-  // gl.disable(gl.LIGHTING);
-  gl.disable(gl.CULL_FACE); // webgl-safe
-  gl.enable(gl.BLEND); // webgl-safe
-  gl.viewport(0, 0, global.sys_glWidth, global.sys_glHeight); // webgl-safe
-
-  // // DONE - In drawSeraphim
-  // gl.matrixMode(gl.PROJECTION);
-  // gl.loadIdentity();
-  // gl.ortho(0, global.sys_glWidth, 0, global.sys_glHeight, -1, 1);
-
-  // // gl.matrixMode(gl.MODELVIEW);
-  // // gl.loadIdentity();
-  gl.clear(gl.COLOR_BUFFER_BIT); // webgl-safe
-
-  // // DONE - No longer exists
-  // gl.enableClientState(gl.COLOR_ARRAY);
-  // gl.enableClientState(gl.VERTEX_ARRAY);
-  // gl.enableClientState(gl.TEXTURE_COORD_ARRAY);
-
-  // Buffer initialization is performed in initSmoke (called from initFlurry)
-
-  if (DRAW_SPARKS) {
-    // initSparkBuffers(global);
-  }
+  init(global);
 }
 
 // const updateSmoke = (function () {
@@ -116,19 +87,17 @@ export function GLSetupRC(global: GlobalInfo): void {
 //   }
 // })();
 
-export function GLRenderScene(
-  global: GlobalInfo,
-  flurry: FlurryInfo,
-  b: number,
-): void {
-  const gl = global.gl;
-
+function drawFlurry(global: GlobalInfo, flurry: FlurryInfo, b: number): void {
   flurry.dframe++;
+
   flurry.fOldTime = flurry.fTime;
   flurry.fTime = timeInSecondsSinceStart(global) + flurry.flurryRandomSeed;
   flurry.fDeltaTime = flurry.fTime - flurry.fOldTime;
+
   flurry.drag = Math.pow(0.9965, flurry.fDeltaTime * 85.0);
+
   updateStar(global, flurry, flurry.star);
+
   // #ifdef DRAW_SPARKS
   if (DRAW_SPARKS) {
     // TODO
@@ -141,7 +110,6 @@ export function GLRenderScene(
     flurry.spark[i].color[0] = 1.0;
     flurry.spark[i].color[1] = 1.0;
     flurry.spark[i].color[2] = 1.0;
-    flurry.spark[i].color[2] = 1.0; // TODO Bug?
     updateSpark(global, flurry, flurry.spark[i]);
 
     // #ifdef DRAW_SPARKS
@@ -151,12 +119,7 @@ export function GLRenderScene(
   }
   updateSmoke_ScalarBase(global, flurry, flurry.s);
 
-  /* glDisable(gl.BLEND); */
-  gl.enable(gl.BLEND);
-  gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
-  // gl.enable(gl.TEXTURE_2D);
   drawSmoke_Scalar(global, flurry, flurry.s, b);
-  // gl.disable(gl.TEXTURE_2D);
 }
 
 export function GLResize(global: GlobalInfo, w: number, h: number): void {
@@ -353,12 +316,8 @@ export function initFlurry(global: GlobalInfo, presetStr: ?string) {
   global.oldFrameTime = -1;
 }
 
-export function drawFlurry(global: GlobalInfo): void {
+export function renderScene(global: GlobalInfo): void {
   const gl = global.gl;
-
-  if (global.flurry?.s?.programInfo == null) {
-    debugger;
-  }
 
   let deltaFrameTime = 0;
   let alpha;
@@ -377,51 +336,29 @@ export function drawFlurry(global: GlobalInfo): void {
      * than that and the blending causes the display to
      * saturate, which looks really ugly.
      */
-    // TODO
-    // if (newFrameTime - global.oldFrameTime < 1 / 60.0) {
-    //   usleep(MAX_(1, int(20000 * (newFrameTime - global.oldFrameTime))));
-    //   return;
-    // }
     deltaFrameTime = newFrameTime - global.oldFrameTime;
-    alpha = 5.0 * deltaFrameTime;
+    // Typical values will be ~ 5/60 = 0.083
+    alpha = Math.min(5.0 * deltaFrameTime, 0.2);
   }
   global.oldFrameTime = newFrameTime;
 
-  if (alpha > 0.2) alpha = 0.2;
-
-  // TODO
-  //   if (!global.glx_context) return;
-
   if (global.frameCounter === 0) {
+    // TODO Move this to init
     global.texid = makeTexture(gl);
   }
 
-  // TODO
-  // gl.drawBuffer(gl.BACK);
-  // gl.xMakeCurrent(display, window, *global.glx_context);
-
-  // TODO (works in webgl!)
   gl.enable(gl.BLEND);
-  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-  // TODONE
-  // gl.color4f(0.0, 0.0, 0.0, alpha);
-  // gl.rectd(0, 0, global.sys_glWidth, global.sys_glHeight);
-  // gl.clearColor(0.0, 0.0, 0.0, alpha);
-  // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  gl.clearColor(0.0, 0.0, 0.0, alpha);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   // const brite = Math.pow(deltaFrameTime, 0.75) * 10;
   const brite = Math.pow(deltaFrameTime, 0.75) * 10 * 5; // <= lmreis this 5 is mine
+
   for (let flurry = global.flurry; flurry; flurry = flurry.next) {
-    GLRenderScene(global, flurry, brite * flurry.briteFactor);
+    drawFlurry(global, flurry, brite * flurry.briteFactor);
   }
-
-  // TODO
-  // if (mi.fps_p) do_fps (mi);
-
-  // TODO
-  // gl.finish();
-  // gl.xSwapBuffers(display, window);
 
   global.frameCounter++;
 }

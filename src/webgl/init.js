@@ -20,3 +20,41 @@
  */
 
 // @flow strict
+
+import type {GlobalInfo} from '../flurry/types';
+
+import {DRAW_SPARKS} from '../flurry/flurry-h';
+
+export function init(global: GlobalInfo): void {
+  const gl = global.gl;
+  /* setup the defaults for OpenGL */
+  gl.disable(gl.DEPTH_TEST); // webgl-safe
+  // // TODO
+  // gl.alphaFunc(gl.GREATER, 0.0);
+  // gl.enable(gl.ALPHA_TEST);
+  // gl.shadeModel(gl.FLAT);
+  // gl.disable(gl.LIGHTING);
+  gl.disable(gl.CULL_FACE); // webgl-safe
+  gl.enable(gl.BLEND); // webgl-safe
+  gl.viewport(0, 0, global.sys_glWidth, global.sys_glHeight); // webgl-safe
+
+  // // DONE - In drawSeraphim
+  // gl.matrixMode(gl.PROJECTION);
+  // gl.loadIdentity();
+  // gl.ortho(0, global.sys_glWidth, 0, global.sys_glHeight, -1, 1);
+
+  // // gl.matrixMode(gl.MODELVIEW);
+  // // gl.loadIdentity();
+  gl.clear(gl.COLOR_BUFFER_BIT); // webgl-safe
+
+  // // DONE - No longer exists
+  // gl.enableClientState(gl.COLOR_ARRAY);
+  // gl.enableClientState(gl.VERTEX_ARRAY);
+  // gl.enableClientState(gl.TEXTURE_COORD_ARRAY);
+
+  // Buffer initialization is performed in initSmoke (called from initFlurry)
+
+  if (DRAW_SPARKS) {
+    // initSparkBuffers(global);
+  }
+}
