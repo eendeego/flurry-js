@@ -23,31 +23,39 @@
 
 // Based on https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Adding_2D_content_to_a_WebGL_context
 
-// Vertex shader program
+import type {ProgramInfo} from '../flurry/types';
 
+// Vertex shader program
 const vsSource = `
   attribute vec4 aVertexPosition;
+  attribute vec2 aTextureCoord;
   attribute vec4 aVertexColor;
 
   uniform mat4 uModelViewMatrix;
   uniform mat4 uProjectionMatrix;
 
+  varying highp vec2 vTextureCoord;
   varying lowp vec4 vColor;
 
   void main() {
     gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+    vTextureCoord = aTextureCoord;
     vColor = aVertexColor;
   }
 `;
 
 // Fragment shader program
 // gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-
+// varying lowp vec4 vColor;
+// gl_FragColor = texture2D(uSampler, vTextureCoord);;
 const fsSource = `
-  varying lowp vec4 vColor;
+  varying highp vec2 vTextureCoord;
   
+  uniform sampler2D uSampler;
+
   void main() {
-    gl_FragColor = vColor;
+    gl_FragColor = texture2D(uSampler, vTextureCoord);;
+    //gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
   }
 `;
 
@@ -101,7 +109,7 @@ export function initShaderProgram(gl: WebGLRenderingContext): ?WebGLProgram {
   // If creating the shader program failed, alert
 
   if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-    alert(
+    console.log(
       'Unable to initialize the shader program: ' +
         (gl.getProgramInfoLog(shaderProgram) ?? '<no log>'),
     );
@@ -109,4 +117,22 @@ export function initShaderProgram(gl: WebGLRenderingContext): ?WebGLProgram {
   }
 
   return shaderProgram;
+}
+
+export function initShaders(gl: WebGLRenderingContext): ProgramInfo {
+  const program = initShaderProgram(gl);
+
+  return {
+    program,
+    attribLocations: {
+      vertexPosition: gl.getAttribLocation(program, 'aVertexPosition'),
+      vertexColor: gl.getAttribLocation(program, 'aVertexColor'),
+      textureCoord: gl.getAttribLocation(program, 'aTextureCoord'),
+    },
+    uniformLocations: {
+      projectionMatrix: gl.getUniformLocation(program, 'uProjectionMatrix'),
+      modelViewMatrix: gl.getUniformLocation(program, 'uModelViewMatrix'),
+      uSampler: gl.getUniformLocation(program, 'uSampler'),
+    },
+  };
 }

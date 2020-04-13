@@ -23,17 +23,56 @@
 
 // Based on https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Adding_2D_content_to_a_WebGL_context
 
-export function initBuffer(
+export function initBuffer2(
   gl: WebGLRenderingContext,
   target: number, // GLEnum,
-  data: $ArrayBufferView,
-  usage: number, // GLEnum
 ): WebGLBuffer {
   const buffer = gl.createBuffer();
   gl.bindBuffer(target, buffer);
-
-  // TODO Not needed: data is not initialized yet // OR IZIT ?
-  gl.bufferData(target, data, usage);
-
   return buffer;
+}
+
+export function initBuffers(
+  gl: WebGLRenderingContext,
+  numSmokeParticles: number,
+) {
+  // Vertices
+  const seraphimVertices = new Float32Array((numSmokeParticles * 2 + 1) * 4);
+  const seraphimVerticesBuffer = initBuffer2(gl, gl.ARRAY_BUFFER);
+  gl.bufferData(gl.ARRAY_BUFFER, seraphimVertices, gl.STREAM_DRAW);
+
+  // Colors
+  const seraphimColors = new Float32Array((numSmokeParticles * 4 + 1) * 4);
+  const seraphimColorsBuffer = initBuffer2(gl, gl.ARRAY_BUFFER);
+  gl.bufferData(gl.ARRAY_BUFFER, seraphimColors, gl.STREAM_DRAW);
+
+  // Textures
+  const seraphimTextures = new Float32Array(numSmokeParticles * 2 * 4 * 4);
+  const seraphimTexturesBuffer = initBuffer2(gl, gl.ARRAY_BUFFER);
+  gl.bufferData(gl.ARRAY_BUFFER, seraphimTextures, gl.STREAM_DRAW);
+
+  // Indices
+  const seraphimIndices = new Uint16Array(numSmokeParticles * 3 * 2);
+  for (let i = 0, j = 0; i < numSmokeParticles; i++) {
+    seraphimIndices[j++] = i * 4;
+    seraphimIndices[j++] = i * 4 + 1;
+    seraphimIndices[j++] = i * 4 + 2;
+
+    seraphimIndices[j++] = i * 4;
+    seraphimIndices[j++] = i * 4 + 2;
+    seraphimIndices[j++] = i * 4 + 3;
+  }
+  const seraphimIndicesBuffer = initBuffer2(gl, gl.ELEMENT_ARRAY_BUFFER);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, seraphimIndices, gl.STATIC_DRAW);
+
+  return {
+    seraphimVertices,
+    seraphimVerticesBuffer,
+    seraphimColors,
+    seraphimColorsBuffer,
+    seraphimTextures,
+    seraphimTexturesBuffer,
+    seraphimIndices,
+    seraphimIndicesBuffer,
+  };
 }

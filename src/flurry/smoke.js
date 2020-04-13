@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // @flow
 
-import type {FlurryInfo, GlobalInfo, SmokeV} from './types';
+import type {ProgramInfo, FlurryInfo, GlobalInfo, SmokeV} from './types';
 
 import {
   MAGIC,
@@ -45,8 +45,8 @@ import {
 } from './flurry-h';
 
 import {mat4} from 'gl-matrix';
-import {initBuffer} from '../webgl/buffers';
-import {initShaderProgram} from '../webgl/shaders';
+import {initBuffers} from '../webgl/buffers';
+import {initShaders} from '../webgl/shaders';
 import nullthrows from 'nullthrows';
 
 // #define MAXANGLES 16384
@@ -55,53 +55,18 @@ import nullthrows from 'nullthrows';
 // #define intensity 75000.0f;
 
 export function initSmoke(gl: WebGLRenderingContext): SmokeV {
-  const program = initShaderProgram(gl);
+  const programInfo = initShaders(gl);
 
-  const programInfo = {
-    program,
-    attribLocations: {
-      vertexPosition: gl.getAttribLocation(program, 'aVertexPosition'),
-      vertexColor: gl.getAttribLocation(program, 'aVertexColor'),
-    },
-    uniformLocations: {
-      projectionMatrix: gl.getUniformLocation(program, 'uProjectionMatrix'),
-      modelViewMatrix: gl.getUniformLocation(program, 'uModelViewMatrix'),
-    },
-  };
-
-  const seraphimVertices = new Float32Array((NUMSMOKEPARTICLES * 2 + 1) * 4);
-  const seraphimVerticesBuffer = initBuffer(
-    gl,
-    gl.ARRAY_BUFFER,
+  const {
     seraphimVertices,
-    gl.STREAM_DRAW,
-  );
-  const seraphimColors = new Float32Array((NUMSMOKEPARTICLES * 4 + 1) * 4);
-  const seraphimColorsBuffer = initBuffer(
-    gl,
-    gl.ARRAY_BUFFER,
+    seraphimVerticesBuffer,
     seraphimColors,
-    gl.STREAM_DRAW,
-  );
-  const seraphimTextures = new Float32Array(NUMSMOKEPARTICLES * 2 * 4 * 4);
-  const seraphimTexturesBuffer = null; //initBuffer(gl, seraphimTextures);
-
-  const seraphimIndices = new Uint16Array(NUMSMOKEPARTICLES * 3 * 2);
-  for (let i = 0, j = 0; i < NUMSMOKEPARTICLES; i++) {
-    seraphimIndices[j++] = i * 4;
-    seraphimIndices[j++] = i * 4 + 1;
-    seraphimIndices[j++] = i * 4 + 2;
-
-    seraphimIndices[j++] = i * 4;
-    seraphimIndices[j++] = i * 4 + 2;
-    seraphimIndices[j++] = i * 4 + 3;
-  }
-  const seraphimIndicesBuffer = initBuffer(
-    gl,
-    gl.ELEMENT_ARRAY_BUFFER,
+    seraphimColorsBuffer,
+    seraphimTextures,
+    seraphimTexturesBuffer,
     seraphimIndices,
-    gl.STATIC_DRAW,
-  );
+    seraphimIndicesBuffer,
+  } = initBuffers(gl, NUMSMOKEPARTICLES);
 
   return {
     p: Array.from({length: NUMSMOKEPARTICLES / 4}, (_, i) => ({
@@ -191,9 +156,6 @@ export function updateSmoke_ScalarBase(
           flurry.spark[i].color[2] * (1.0 + randBell(MAGIC.colorIncoherence));
         s.p[s.nextParticle].color[3 * 4 + s.nextSubParticle] =
           0.85 * (1.0 + randBell(0.5 * MAGIC.colorIncoherence));
-        if (s.nextSubParticle === 3) {
-          console.log('next color', s.p[s.nextParticle].color);
-        }
 
         s.p[s.nextParticle].time[s.nextSubParticle] = flurry.fTime;
         s.p[s.nextParticle].dead[s.nextSubParticle] = 0;
@@ -381,8 +343,6 @@ export function drawSmoke_Scalar(
           const cmv2 = s.p[i].color[2 * 4 + k] * cm;
           const cmv3 = s.p[i].color[3 * 4 + k] * cm;
 
-          console.log({brightness, cmv: [cmv0, cmv1, cmv2, cmv3]});
-
           // #if 0
           if (false) {
             // /* MDT we can't use vectors in the Scalar routine */
@@ -427,45 +387,7 @@ export function drawSmoke_Scalar(
   }
 }
 
-function drawSeraphim(global: GlobalInfo, quads: number): void {
-  const {gl, flurry} = global;
-  const {
-    s: {
-      seraphimVertices,
-      seraphimVerticesBuffer,
-      seraphimColors,
-      seraphimColorsBuffer,
-      seraphimIndicesBuffer,
-      programInfo,
-    },
-  } = nullthrows(flurry);
-
-  // gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
-  // gl.clearDepth(1.0); // Clear everything
-  // gl.enable(gl.DEPTH_TEST); // Enable depth testing
-  // gl.depthFunc(gl.LEQUAL); // Near things obscure far things
-
-  // Clear the canvas before we start drawing on it.
-
-  // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-  // Create a perspective matrix, a special matrix that is
-  // used to simulate the distortion of perspective in a camera.
-  // Our field of view is 45 degrees, with a width/height
-  // ratio that matches the display size of the canvas
-  // and we only want to see objects between 0.1 units
-  // and 100 units away from the camera.
-
-  // const fieldOfView = (45 * Math.PI) / 180; // in radians
-  // const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-  // const zNear = 0.1;
-  // const zFar = 100.0;
-  // const projectionMatrix = mat4.create();
-
-  // // note: glmatrix.js always has the first argument
-  // // as the destination to receive the result.
-  // mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
-
+function matrixes(gl: WebGLRenderingContext): [mat4, mat4] {
   const left = 0;
   const right = gl.canvas.clientWidth;
   const bottom = 0;
@@ -490,51 +412,139 @@ function drawSeraphim(global: GlobalInfo, quads: number): void {
   // ); // amount to translate
   mat4.identity(modelViewMatrix);
 
+  return [projectionMatrix, modelViewMatrix];
+}
+
+function applyVertices(
+  gl: WebGLRenderingContext,
+  programInfo: ProgramInfo,
+  buffer: WebGLBuffer,
+  data: $ArrayBufferView,
+): void {
+  const numComponents = 2;
+  const type = gl.FLOAT;
+  const normalize = false;
+  const stride = 0;
+  const offset = 0;
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.vertexAttribPointer(
+    programInfo.attribLocations.vertexPosition,
+    numComponents,
+    type,
+    normalize,
+    stride,
+    offset,
+  );
+  gl.bufferSubData(gl.ARRAY_BUFFER, 0, data);
+  gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
+}
+
+function applyTextures(
+  gl: WebGLRenderingContext,
+  programInfo: ProgramInfo,
+  buffer: WebGLBuffer,
+  data: $ArrayBufferView,
+): void {
+  const numComponents = 2;
+  const type = gl.FLOAT;
+  const normalize = false;
+  const stride = 0;
+  const offset = 0;
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.vertexAttribPointer(
+    programInfo.attribLocations.textureCoord,
+    numComponents,
+    type,
+    normalize,
+    stride,
+    offset,
+  );
+  gl.bufferSubData(gl.ARRAY_BUFFER, 0, data);
+  gl.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
+}
+
+function applyColors(
+  gl: WebGLRenderingContext,
+  programInfo: ProgramInfo,
+  buffer: WebGLBuffer,
+  data: $ArrayBufferView,
+): void {
+  const numComponents = 4;
+  const type = gl.FLOAT;
+  const normalize = false;
+  const stride = 0;
+  const offset = 0;
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferSubData(gl.ARRAY_BUFFER, 0, data);
+  gl.vertexAttribPointer(
+    programInfo.attribLocations.vertexColor,
+    numComponents,
+    type,
+    normalize,
+    stride,
+    offset,
+  );
+  gl.enableVertexAttribArray(programInfo.attribLocations.vertexColor);
+}
+
+function applyIndices(gl: WebGLRenderingContext, buffer: WebGLBuffer): void {
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
+}
+
+function drawSeraphim(global: GlobalInfo, quads: number): void {
+  const {gl, flurry, texid} = global;
+  const {
+    s: {
+      seraphimVertices,
+      seraphimVerticesBuffer,
+      seraphimTextures,
+      seraphimTexturesBuffer,
+      seraphimColors,
+      seraphimColorsBuffer,
+      seraphimIndicesBuffer,
+      programInfo,
+    },
+  } = nullthrows(flurry);
+
+  // gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
+  // gl.clearDepth(1.0); // Clear everything
+  // gl.enable(gl.DEPTH_TEST); // Enable depth testing
+  // gl.depthFunc(gl.LEQUAL); // Near things obscure far things
+
+  // Clear the canvas before we start drawing on it.
+
+  // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  const [projectionMatrix, modelViewMatrix] = matrixes(gl);
+
   // Tell WebGL how to pull out the positions from the position
   // buffer into the vertexPosition attribute.
+  applyVertices(gl, programInfo, seraphimVerticesBuffer, seraphimVertices);
+
   {
-    const numComponents = 2;
-    const type = gl.FLOAT;
-    const normalize = false;
-    const stride = 0;
-    const offset = 0;
-    gl.bindBuffer(gl.ARRAY_BUFFER, seraphimVerticesBuffer);
-    gl.vertexAttribPointer(
-      programInfo.attribLocations.vertexPosition,
-      numComponents,
-      type,
-      normalize,
-      stride,
-      offset,
-    );
-    gl.bufferSubData(gl.ARRAY_BUFFER, 0, seraphimVertices);
-    gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
+    let i = 0;
+    for (let j = 0; j < quads; j++) {
+      seraphimTextures[i++] = 0;
+      seraphimTextures[i++] = 0;
+      seraphimTextures[i++] = 0;
+      seraphimTextures[i++] = 0.125;
+      seraphimTextures[i++] = 0.125;
+      seraphimTextures[i++] = 0.125;
+      seraphimTextures[i++] = 0.125;
+      seraphimTextures[i++] = 0;
+    }
   }
+
+  // Tell WebGL how to pull out the positions from the position
+  // buffer into the vertexPosition attribute
+  applyTextures(gl, programInfo, seraphimTexturesBuffer, seraphimTextures);
 
   // Tell WebGL how to pull out the colors from the color buffer
   // into the vertexColor attribute.
-  {
-    const numComponents = 4;
-    const type = gl.FLOAT;
-    const normalize = false;
-    const stride = 0;
-    const offset = 0;
-    gl.bindBuffer(gl.ARRAY_BUFFER, seraphimColorsBuffer);
-    gl.bufferSubData(gl.ARRAY_BUFFER, 0, seraphimColors);
-    gl.vertexAttribPointer(
-      programInfo.attribLocations.vertexColor,
-      numComponents,
-      type,
-      normalize,
-      stride,
-      offset,
-    );
-    gl.enableVertexAttribArray(programInfo.attribLocations.vertexColor);
-  }
+  applyColors(gl, programInfo, seraphimColorsBuffer, seraphimColors);
 
   // Tell WebGL which indices to use to index the vertices
-  // gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, seraphimIndices, gl.STATIC_DRAW);
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, seraphimIndicesBuffer);
+  applyIndices(gl, seraphimIndicesBuffer);
 
   // Tell WebGL to use our program when drawing
 
@@ -552,6 +562,15 @@ function drawSeraphim(global: GlobalInfo, quads: number): void {
     false,
     modelViewMatrix,
   );
+
+  // Tell WebGL we want to affect texture unit 0
+  gl.activeTexture(gl.TEXTURE0);
+
+  // Bind the texture to texture unit 0
+  gl.bindTexture(gl.TEXTURE_2D, texid);
+
+  // Tell the shader we bound the texture to texture unit 0
+  gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
 
   {
     const vertexCount = 6 * quads;

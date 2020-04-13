@@ -40,10 +40,12 @@ export type ProgramInfo = {
   attribLocations: {
     vertexPosition: number,
     vertexColor: number,
+    textureCoord: number,
   },
   uniformLocations: {
     projectionMatrix: ?WebGLUniformLocation,
     modelViewMatrix: ?WebGLUniformLocation,
+    uSampler: ?WebGLUniformLocation,
   },
 };
 
@@ -123,7 +125,7 @@ export type GlobalInfo = {|
   oldFrameTime: number,
 
   flurry: ?FlurryInfo,
-  texid: number, // GLuint
+  texid: WebGLTexture, // GLuint
 
   // Only used if DRAW_SPARKS is true
   debug?: {

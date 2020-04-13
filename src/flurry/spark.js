@@ -40,8 +40,8 @@ import ColorModes from './color-modes';
 import {MAGIC, randBell, randFlt} from './flurry-h';
 import {mat4} from 'gl-matrix';
 import nullthrows from 'nullthrows';
-import {initBuffer} from '../webgl/buffers';
-import {initShaderProgram} from '../webgl/shaders';
+// import {initBuffer} from "../webgl/buffers";
+// import {initShaderProgram} from "../webgl/shaders";
 
 export function initSpark(): Spark {
   return {
@@ -416,38 +416,38 @@ export function updateSpark(global: GlobalInfo, flurry: FlurryInfo, s: Spark) {
   }
 }
 
-export function initSparkBuffers(global: GlobalInfo): void {
-  const gl = global.gl;
+// export function initSparkBuffers(global: GlobalInfo): void {
+//   const gl = global.gl;
 
-  const program = initShaderProgram(global.gl);
+//   const program = initShaderProgram(global.gl);
 
-  const programInfo = {
-    program,
-    attribLocations: {
-      vertexPosition: gl.getAttribLocation(program, 'aVertexPosition'),
-      vertexColor: gl.getAttribLocation(program, 'aVertexColor'),
-    },
-    uniformLocations: {
-      projectionMatrix: gl.getUniformLocation(program, 'uProjectionMatrix'),
-      modelViewMatrix: gl.getUniformLocation(program, 'uModelViewMatrix'),
-    },
-  };
+//   const programInfo = {
+//     program,
+//     attribLocations: {
+//       vertexPosition: gl.getAttribLocation(program, "aVertexPosition"),
+//       vertexColor: gl.getAttribLocation(program, "aVertexColor"),
+//     },
+//     uniformLocations: {
+//       projectionMatrix: gl.getUniformLocation(program, "uProjectionMatrix"),
+//       modelViewMatrix: gl.getUniformLocation(program, "uModelViewMatrix"),
+//     },
+//   };
 
-  const vertices = new Float32Array(6 * 2);
-  const verticesBuffer = initBuffer(
-    global.gl,
-    gl.ARRAY_BUFFER,
-    vertices,
-    gl.STREAM_DRAW,
-  );
+//   const vertices = new Float32Array(6 * 2);
+//   const verticesBuffer = initBuffer(
+//     global.gl,
+//     gl.ARRAY_BUFFER,
+//     vertices,
+//     gl.STREAM_DRAW,
+//   );
 
-  if (global.debug == null) {
-    global.debug = {};
-  }
+//   if (global.debug == null) {
+//     global.debug = {};
+//   }
 
-  global.debug.spark = {
-    vertices,
-    verticesBuffer,
-    programInfo,
-  };
-}
+//   global.debug.spark = {
+//     vertices,
+//     verticesBuffer,
+//     programInfo,
+//   };
+// }

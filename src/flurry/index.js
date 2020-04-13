@@ -43,7 +43,8 @@ import {DRAW_SPARKS} from './flurry-h';
 import {newFlurryInfo} from './flurry-info';
 import {PresetNum} from './preset-num';
 import {drawSmoke_Scalar, updateSmoke_ScalarBase} from './smoke';
-import {drawSpark, updateSpark, initSparkBuffers} from './spark';
+import {drawSpark, updateSpark} from './spark';
+// import {drawSpark, updateSpark, initSparkBuffers} from "./spark";
 import {updateStar} from './star';
 import {makeTexture} from './texture';
 
@@ -79,7 +80,7 @@ export function GLSetupRC(global: GlobalInfo): void {
   // Buffer initialization is performed in initSmoke (called from initFlurry)
 
   if (DRAW_SPARKS) {
-    initSparkBuffers(global);
+    // initSparkBuffers(global);
   }
 }
 
@@ -411,7 +412,6 @@ export function drawFlurry(global: GlobalInfo): void {
 
   const brite = Math.pow(deltaFrameTime, 0.75) * 10;
   for (let flurry = global.flurry; flurry; flurry = flurry.next) {
-    console.log({brite, briteFactor: flurry.briteFactor});
     GLRenderScene(global, flurry, brite * flurry.briteFactor);
   }
 
