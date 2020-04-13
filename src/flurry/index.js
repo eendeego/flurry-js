@@ -395,14 +395,14 @@ export function drawFlurry(global: GlobalInfo): void {
   // gl.xMakeCurrent(display, window, *global.glx_context);
 
   // TODO (works in webgl!)
-  // gl.enable(gl.BLEND);
-  // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
   // TODONE
   // gl.color4f(0.0, 0.0, 0.0, alpha);
   // gl.rectd(0, 0, global.sys_glWidth, global.sys_glHeight);
-  // gl.clearColor(0.0, 0.0, 0.0, 1.0);
-  // gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.clearColor(0.0, 0.0, 0.0, alpha);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   const brite = Math.pow(deltaFrameTime, 0.75) * 10;
   for (let flurry = global.flurry; flurry; flurry = flurry.next) {

@@ -11,14 +11,9 @@ function App() {
   const height = 480;
   const canvasRef = useRef();
   useEffect(() => {
-    console.log('App effect!');
-
     const canvas = canvasRef.current;
     const renderingContext = newRenderingContext(canvas);
     const global = newGlobal(renderingContext);
-
-    // TODO
-    window.global = global;
 
     // initFlurry(global, DEF_PRESET);
     // initFlurry(global, "water");
@@ -35,20 +30,23 @@ function App() {
       }
 
       // TODO
-      if (global.frameCounter < 2) {
-        handle = requestAnimationFrame(update);
-      }
+      // if (global.frameCounter < 5) {
+      handle = requestAnimationFrame(update);
+      // }
     };
 
     update();
     return () => cancelAnimationFrame(handle);
   }, []);
 
-  console.log('App');
-
   return (
     <div className="App">
-      <canvas ref={canvasRef} width={width} height={height} />
+      <canvas
+        style={{backgroundColor: 'black'}}
+        ref={canvasRef}
+        width={width}
+        height={height}
+      />
     </div>
   );
 }
