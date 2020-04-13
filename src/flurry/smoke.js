@@ -383,7 +383,7 @@ export function drawSmoke_Scalar(
   }
 
   if (quads > 0) {
-    drawSeraphim(global, quads);
+    drawSeraphim(global, flurry, quads);
   }
 }
 
@@ -491,8 +491,12 @@ function applyIndices(gl: WebGLRenderingContext, buffer: WebGLBuffer): void {
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
 }
 
-function drawSeraphim(global: GlobalInfo, quads: number): void {
-  const {gl, flurry, texid} = global;
+function drawSeraphim(
+  global: GlobalInfo,
+  flurry: FlurryInfo,
+  quads: number,
+): void {
+  const {gl, texid} = global;
   const {
     s: {
       seraphimVertices,

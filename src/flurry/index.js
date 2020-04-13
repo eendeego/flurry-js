@@ -52,13 +52,13 @@ export const DEF_PRESET = 'random';
 
 export function GLSetupRC(global: GlobalInfo): void {
   const gl = global.gl;
-  // TODO
   /* setup the defaults for OpenGL */
   gl.disable(gl.DEPTH_TEST); // webgl-safe
-  // // gl.alphaFunc(gl.GREATER, 0.0);
-  // // gl.enable(gl.ALPHA_TEST);
-  // // gl.shadeModel(gl.FLAT);
-  // // gl.disable(gl.LIGHTING);
+  // // TODO
+  // gl.alphaFunc(gl.GREATER, 0.0);
+  // gl.enable(gl.ALPHA_TEST);
+  // gl.shadeModel(gl.FLAT);
+  // gl.disable(gl.LIGHTING);
   gl.disable(gl.CULL_FACE); // webgl-safe
   gl.enable(gl.BLEND); // webgl-safe
   gl.viewport(0, 0, global.sys_glWidth, global.sys_glHeight); // webgl-safe
@@ -70,9 +70,9 @@ export function GLSetupRC(global: GlobalInfo): void {
 
   // // gl.matrixMode(gl.MODELVIEW);
   // // gl.loadIdentity();
-  // gl.clear(gl.COLOR_BUFFER_BIT); // webgl-safe
+  gl.clear(gl.COLOR_BUFFER_BIT); // webgl-safe
 
-  // // "DONE" - No longer exists
+  // // DONE - No longer exists
   // gl.enableClientState(gl.COLOR_ARRAY);
   // gl.enableClientState(gl.VERTEX_ARRAY);
   // gl.enableClientState(gl.TEXTURE_COORD_ARRAY);
@@ -121,7 +121,7 @@ export function GLRenderScene(
   flurry: FlurryInfo,
   b: number,
 ): void {
-  // const gl = global.gl;
+  const gl = global.gl;
 
   flurry.dframe++;
   flurry.fOldTime = flurry.fTime;
@@ -152,8 +152,8 @@ export function GLRenderScene(
   updateSmoke_ScalarBase(global, flurry, flurry.s);
 
   /* glDisable(gl.BLEND); */
-  // gl.enable(gl.BLEND);
-  // gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
   // gl.enable(gl.TEXTURE_2D);
   drawSmoke_Scalar(global, flurry, flurry.s, b);
   // gl.disable(gl.TEXTURE_2D);
@@ -407,10 +407,11 @@ export function drawFlurry(global: GlobalInfo): void {
   // TODONE
   // gl.color4f(0.0, 0.0, 0.0, alpha);
   // gl.rectd(0, 0, global.sys_glWidth, global.sys_glHeight);
-  gl.clearColor(0.0, 0.0, 0.0, alpha);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  // gl.clearColor(0.0, 0.0, 0.0, alpha);
+  // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  const brite = Math.pow(deltaFrameTime, 0.75) * 10;
+  // const brite = Math.pow(deltaFrameTime, 0.75) * 10;
+  const brite = Math.pow(deltaFrameTime, 0.75) * 10 * 5; // <= lmreis this 5 is mine
   for (let flurry = global.flurry; flurry; flurry = flurry.next) {
     GLRenderScene(global, flurry, brite * flurry.briteFactor);
   }

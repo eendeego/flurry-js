@@ -45,17 +45,16 @@ const vsSource = `
 `;
 
 // Fragment shader program
-// gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-// varying lowp vec4 vColor;
-// gl_FragColor = texture2D(uSampler, vTextureCoord);;
 const fsSource = `
   varying highp vec2 vTextureCoord;
+  varying lowp vec4 vColor;
   
   uniform sampler2D uSampler;
 
   void main() {
-    gl_FragColor = texture2D(uSampler, vTextureCoord);;
-    //gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    // gl_FragColor = texture2D(uSampler, vTextureCoord);
+    // gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    gl_FragColor = texture2D(uSampler, vTextureCoord) * vColor;
   }
 `;
 
@@ -81,7 +80,7 @@ export function loadShader(
   // See if it compiled successfully
 
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    alert(
+    console.log(
       'An error occurred compiling the shaders: ' +
         (gl.getShaderInfoLog(shader) ?? '<no log>'),
     );

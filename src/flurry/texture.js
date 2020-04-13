@@ -204,7 +204,7 @@ export function makeTexture(gl: WebGLRenderingContext): WebGLTexture {
     }
   }
 
-  dumpBigTexture();
+  // dumpBigTexture();
 
   // // TODO
   // gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
