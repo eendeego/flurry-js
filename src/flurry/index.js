@@ -50,26 +50,31 @@ import {makeTexture} from './texture';
 export const DEF_PRESET = 'random';
 
 export function GLSetupRC(global: GlobalInfo): void {
-  // const gl = global.gl;
+  const gl = global.gl;
   // TODO
   /* setup the defaults for OpenGL */
-  // gl.disable(gl.DEPTH_TEST); // webgl-safe
+  gl.disable(gl.DEPTH_TEST); // webgl-safe
   // // gl.alphaFunc(gl.GREATER, 0.0);
   // // gl.enable(gl.ALPHA_TEST);
   // // gl.shadeModel(gl.FLAT);
   // // gl.disable(gl.LIGHTING);
-  // gl.disable(gl.CULL_FACE); // webgl-safe
-  // gl.enable(gl.BLEND); // webgl-safe
-  // gl.viewport(0, 0, global.sys_glWidth, global.sys_glHeight); // webgl-safe
-  // // gl.matrixMode(gl.PROJECTION);
-  // // gl.loadIdentity();
-  // // gl.ortho(0, global.sys_glWidth, 0, global.sys_glHeight, -1, 1);
+  gl.disable(gl.CULL_FACE); // webgl-safe
+  gl.enable(gl.BLEND); // webgl-safe
+  gl.viewport(0, 0, global.sys_glWidth, global.sys_glHeight); // webgl-safe
+
+  // // DONE - In drawSeraphim
+  // gl.matrixMode(gl.PROJECTION);
+  // gl.loadIdentity();
+  // gl.ortho(0, global.sys_glWidth, 0, global.sys_glHeight, -1, 1);
+
   // // gl.matrixMode(gl.MODELVIEW);
   // // gl.loadIdentity();
   // gl.clear(gl.COLOR_BUFFER_BIT); // webgl-safe
-  // // gl.enableClientState(gl.COLOR_ARRAY);
-  // // gl.enableClientState(gl.VERTEX_ARRAY);
-  // // gl.enableClientState(gl.TEXTURE_COORD_ARRAY);
+
+  // // "DONE" - No longer exists
+  // gl.enableClientState(gl.COLOR_ARRAY);
+  // gl.enableClientState(gl.VERTEX_ARRAY);
+  // gl.enableClientState(gl.TEXTURE_COORD_ARRAY);
 
   // Buffer initialization is performed in initSmoke (called from initFlurry)
 
@@ -167,8 +172,8 @@ const presetStr2PresetNum = {
   classic: PresetNum.PRESET_CLASSIC,
   insane: PresetNum.PRESET_INSANE,
 };
-function presetStr2Num(presetStr: string): PresetNumType {
-  if (presetStr == null || presetStr === '') {
+function presetStr2Num(presetStr: ?string): PresetNumType {
+  if (presetStr == null || presetStr.length === 0) {
     return presetStr2Num(DEF_PRESET);
   }
 
@@ -182,7 +187,7 @@ function presetStr2Num(presetStr: string): PresetNumType {
     return presetStr2PresetNum[presetStr];
   }
 
-  console.log(`unknown preset ${presetStr}`);
+  throw new Error(`unknown preset ${presetStr}`);
 }
 
 /* new window size or exposure */
@@ -333,7 +338,7 @@ export function initFlurry(global: GlobalInfo, presetStr: ?string) {
       break;
     }
     default: {
-      console.log(`unknown preset ${presetStr} | ${presetNum}`);
+      console.log(`unknown preset ${presetStr ?? '<null>'} | ${presetNum}`);
     }
   }
 
@@ -406,6 +411,7 @@ export function drawFlurry(global: GlobalInfo): void {
 
   const brite = Math.pow(deltaFrameTime, 0.75) * 10;
   for (let flurry = global.flurry; flurry; flurry = flurry.next) {
+    console.log({brite, briteFactor: flurry.briteFactor});
     GLRenderScene(global, flurry, brite * flurry.briteFactor);
   }
 

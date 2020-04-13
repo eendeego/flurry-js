@@ -425,6 +425,7 @@ export function initSparkBuffers(global: GlobalInfo): void {
     program,
     attribLocations: {
       vertexPosition: gl.getAttribLocation(program, 'aVertexPosition'),
+      vertexColor: gl.getAttribLocation(program, 'aVertexColor'),
     },
     uniformLocations: {
       projectionMatrix: gl.getUniformLocation(program, 'uProjectionMatrix'),
@@ -433,7 +434,12 @@ export function initSparkBuffers(global: GlobalInfo): void {
   };
 
   const vertices = new Float32Array(6 * 2);
-  const verticesBuffer = initBuffer(global.gl, vertices);
+  const verticesBuffer = initBuffer(
+    global.gl,
+    gl.ARRAY_BUFFER,
+    vertices,
+    gl.STREAM_DRAW,
+  );
 
   if (global.debug == null) {
     global.debug = {};

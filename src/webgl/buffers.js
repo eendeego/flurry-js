@@ -25,13 +25,15 @@
 
 export function initBuffer(
   gl: WebGLRenderingContext,
+  target: number, // GLEnum,
   data: $ArrayBufferView,
+  usage: number, // GLEnum
 ): WebGLBuffer {
   const buffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bindBuffer(target, buffer);
 
-  // TODO Not needed: data is not initialized yet
-  gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+  // TODO Not needed: data is not initialized yet // OR IZIT ?
+  gl.bufferData(target, data, usage);
 
   return buffer;
 }

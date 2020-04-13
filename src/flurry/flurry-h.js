@@ -30,20 +30,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-// @flow
+// @flow strict
 
 export function fastDistance2D(x: number, y: number): number {
   /* this function computes the distance from 0,0 to x,y with ~3.5% error */
-  let mn;
   /* first compute the absolute value of x,y */
-  x = x < 0.0 ? -x : x;
-  y = y < 0.0 ? -y : y;
+  const xx = x < 0.0 ? -x : x;
+  const yy = y < 0.0 ? -y : y;
 
   /* compute the minimum of x,y */
-  mn = x < y ? x : y;
+  const mn = xx < yy ? xx : yy;
 
   /* return the distance */
-  return x + y - mn * 0.5 - mn * 0.25 + mn * 0.0625;
+  return xx + yy - mn * 0.5 - mn * 0.25 + mn * 0.0625;
 }
 
 export function randFlt(min: number, max: number): number {
