@@ -30,19 +30,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-// @flow
+// @flow strict
 
 import type {ColorModesType} from './color-modes';
 import type {OptimizationModesType} from './optimization-modes';
 
+export type ProgramInfo = {
+  program: WebGLProgram,
+  attribLocations: {
+    vertexPosition: number,
+  },
+  uniformLocations: {
+    projectionMatrix: ?WebGLUniformLocation,
+    modelViewMatrix: ?WebGLUniformLocation,
+  },
+};
+
 export type SmokeParticleV = {
-  color: Array<Array<number>>, // floatToVector
-  position: Array<Array<number>>, // floatToVector
-  oldposition: Array<Array<number>>, // floatToVector
-  delta: Array<Array<number>>, // floatToVector
-  dead: Array<number>, // intToVector
-  time: Array<number>, // floatToVector
-  animFrame: Array<number>, // intToVector
+  color: Float32Array, // floatToVector[4];
+  position: Float32Array, // floatToVector[3];
+  oldposition: Float32Array, // floatToVector[3];
+  delta: Float32Array, // floatToVector[3];
+  dead: Uint32Array, // intToVector;
+  time: Float32Array, // floatToVector;
+  animFrame: Uint32Array, // intToVector;
 };
 
 export type SmokeV = {
@@ -53,9 +64,13 @@ export type SmokeV = {
   firstTime: number,
   frame: number,
   old: Array<number>, // [3];
-  seraphimVertices: Array<Array<number>>,
-  seraphimColors: Array<Array<number>>,
-  seraphimTextures: Array<number>, // [NUMSMOKEPARTICLES*2*4];
+  seraphimVertices: Float32Array, // NUMSMOKEPARTICLES*2+1
+  seraphimVerticesBuffer: WebGLBuffer,
+  seraphimColors: Float32Array, // NUMSMOKEPARTICLES*4+1
+  seraphimColorsBuffer: WebGLBuffer,
+  seraphimTextures: Float32Array, // [NUMSMOKEPARTICLES*2*4];
+  seraphimTexturesBuffer: WebGLBuffer,
+  programInfo: ProgramInfo,
 };
 
 export type Star = {|
@@ -69,7 +84,7 @@ export type Spark = {|
   position: Array<number>, // or [number, number, number]
   mystery: number,
   delta: Array<number>, // or [number, number, number]
-  color: Array<number>, // or [number, number, number,number]
+  color: Array<number>, // or [number, number, number, number]
 |};
 
 export type FlurryInfo = {|
@@ -93,7 +108,7 @@ export type GlobalInfo = {|
   /* system values */
   // glx_context: GLXContext,
   // window: Window,
-  renderingContext: RenderingContext,
+  gl: WebGLRenderingContext,
   // canvas: HTMLCanvasElement,
   optMode: OptimizationModesType,
 
@@ -101,11 +116,20 @@ export type GlobalInfo = {|
   sys_glHeight: number,
 
   gTimeCounter: number,
-  first: boolean,
+  frameCounter: number,
   oldFrameTime: number,
 
   flurry: ?FlurryInfo,
   texid: number, // GLuint
+
+  // Only used if DRAW_SPARKS is true
+  debug?: {
+    spark: {
+      vertices: Float32Array,
+      verticesBuffer: WebGLBuffer,
+      programInfo: ProgramInfo,
+    },
+  },
 |};
 
 export type RenderContext = {|

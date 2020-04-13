@@ -38,6 +38,10 @@ import type {FlurryInfo, GlobalInfo, Spark} from './types';
 
 import ColorModes from './color-modes';
 import {MAGIC, randBell, randFlt} from './flurry-h';
+import {mat4} from 'gl-matrix';
+import nullthrows from 'nullthrows';
+import {initBuffer} from '../webgl/buffers';
+import {initShaderProgram} from '../webgl/shaders';
 
 export function initSpark(): Spark {
   return {
@@ -53,42 +57,170 @@ export function drawSpark(
   flurry: FlurryInfo,
   s: Spark,
 ): void {
-  const black = [0.0, 0.0, 0.0, 1.0];
+  const gl = global.gl;
+  const spark = nullthrows(global.debug?.spark);
+  const modelViewMatrix = mat4.create();
+  const projectionMatrix = mat4.create();
+
+  // Create a perspective matrix, a special matrix that is
+  // used to simulate the distortion of perspective in a camera.
+  // Our field of view is 45 degrees, with a width/height
+  // ratio that matches the display size of the canvas
+  // and we only want to see objects between 0.1 units
+  // and 100 units away from the camera.
+
+  {
+    const fieldOfView = (45 * Math.PI) / 180; // in radians
+    const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+    const zNear = 0.1;
+    const zFar = 100.0;
+    // const projectionMatrix = mat4.create();
+
+    // note: glmatrix.js always has the first argument
+    // as the destination to receive the result.
+    mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
+  }
+
+  // TODO Move to shader
+  // const black = [0.0, 0.0, 0.0, 1.0];
   const c = 0.0625;
-  const width = (60000.0 * global.sys_glWidth) / 1024.0;
+  {
+    const width = (60000.0 * global.sys_glWidth) / 1024.0;
 
-  const z = s.position[2];
-  const sx =
-    (s.position[0] * global.sys_glWidth) / z + global.sys_glWidth * 0.5;
-  const sy =
-    (s.position[1] * global.sys_glWidth) / z + global.sys_glHeight * 0.5;
-  const w = (width * 4.0) / z;
+    const z = s.position[2];
+    const sx =
+      (s.position[0] * global.sys_glWidth) / z + global.sys_glWidth * 0.5;
+    const sy =
+      (s.position[1] * global.sys_glWidth) / z + global.sys_glHeight * 0.5;
+    const w = (width * 4.0) / z;
 
-  const screenx = sx;
-  const screeny = sy;
+    const screenx = sx;
+    const screeny = sy;
 
-  // TODO
-  //   glPushMatrix();
-  //   glTranslatef(screenx, screeny, 0.0);
-  //   scale = w / 50.0;
-  //   glScalef(scale, scale, 0.0);
-  //   for (k = 0; k < 12; k++) {
-  //     const a = Math.floor(Math.random() * 3600) / 10.0;
-  //     glRotatef(a, 0.0, 0.0, 1.0);
-  //     glBegin(GL_QUAD_STRIP);
-  //     glColor4fv(black);
-  //     glVertex2f(-3.0, 0.0);
-  //     a = 2.0 + Math.floor(Math.random() * 256) * c;
-  //     glVertex2f(-3.0, a);
-  //     glColor4fv(s.color);
-  //     glVertex2f(0.0, 0.0);
-  //     glColor4fv(black);
-  //     glVertex2f(0.0, a);
-  //     glVertex2f(3.0, 0.0);
-  //     glVertex2f(3.0, a);
-  //     glEnd();
-  //   }
-  //   glPopMatrix();
+    // // TODO
+    // gl.pushMatrix();
+    // gl.translatef(screenx, screeny, 0.0);
+    const scale = w / 50.0;
+    // gl.scalef(scale, scale, 0.0);
+
+    console.log({screenx, screeny, scale});
+
+    // Set the drawing position to the "identity" point, which is
+    // the center of the scene.
+    // const modelViewMatrix = mat4.create();
+
+    // Now move the drawing position a bit to where we want to
+    // start drawing the square.
+
+    mat4.translate(
+      modelViewMatrix, // destination matrix
+      modelViewMatrix, // matrix to translate
+      [0, 0, -6.0], // amount to translate
+    );
+    // mat4.translate(
+    //   modelViewMatrix, // destination matrix
+    //   modelViewMatrix, // matrix to translate
+    //   [screenx, screeny, -6.0], // amount to translate
+    // );
+    // mat4.scale(
+    //   modelViewMatrix, // destination matrix
+    //   modelViewMatrix, // matrix to translate
+    //   [scale, scale, 0], // amount to translate
+    // );
+  }
+
+  for (let k = 0; k < 12; k++) {
+    let a = Math.floor(Math.random() * 3600) / 10.0;
+    // TODO
+    // gl.rotatef(a, 0.0, 0.0, 1.0);
+    // gl.begin(gl.QUAD_STRIP);
+    // gl.color4fv(black);
+    // gl.vertex2f(-3.0, 0.0);
+    spark.vertices[0] = -3.0;
+    spark.vertices[1] = 0.0;
+    a = 2.0 + Math.floor(Math.random() * 256) * c;
+    // gl.vertex2f(-3.0, a);
+    spark.vertices[2] = -3.0;
+    spark.vertices[3] = a;
+    // {
+    //   const offset = 0;
+    //   const vertexCount = 2;
+    //   gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
+    // }
+
+    // TODO
+    // gl.color4fv(s.color);
+    spark.vertices[4] = 0.0;
+    spark.vertices[5] = 0.0;
+    // gl.vertex2f(0.0, 0.0);
+    // gl.color4fv(black);
+    // gl.vertex2f(0.0, a);
+    // gl.vertex2f(3.0, 0.0);
+    // gl.vertex2f(3.0, a);
+    spark.vertices[6] = 0.0;
+    spark.vertices[7] = a;
+    spark.vertices[8] = 3.0;
+    spark.vertices[9] = 0.0;
+    spark.vertices[10] = 3.0;
+    spark.vertices[11] = a;
+    // gl.end();
+
+    {
+      let ii = 0;
+      spark.vertices[ii++] = -1.0;
+      spark.vertices[ii++] = -1.0;
+      spark.vertices[ii++] = -1.0;
+      spark.vertices[ii++] = 1.0;
+      spark.vertices[ii++] = -1.0;
+      spark.vertices[ii++] = 1.0;
+      spark.vertices[ii++] = -1.0;
+      spark.vertices[ii++] = 1.0;
+    }
+    // Tell WebGL how to pull out the positions from the position
+    // buffer into the vertexPosition attribute.
+    {
+      const numComponents = 2;
+      const type = gl.FLOAT;
+      const normalize = false;
+      const stride = 0;
+      const offset = 0;
+      gl.bindBuffer(gl.ARRAY_BUFFER, spark.verticesBuffer);
+      gl.vertexAttribPointer(
+        spark.programInfo.attribLocations.vertexPosition,
+        numComponents,
+        type,
+        normalize,
+        stride,
+        offset,
+      );
+      gl.enableVertexAttribArray(
+        spark.programInfo.attribLocations.vertexPosition,
+      );
+    }
+
+    // Tell WebGL to use our program when drawing
+
+    gl.useProgram(spark.programInfo.program);
+
+    // Set the shader uniforms
+
+    gl.uniformMatrix4fv(
+      spark.programInfo.uniformLocations.projectionMatrix,
+      false, // no transpose
+      projectionMatrix,
+    );
+    gl.uniformMatrix4fv(
+      spark.programInfo.uniformLocations.modelViewMatrix,
+      false, // no transpose
+      modelViewMatrix,
+    );
+    {
+      const offset = 0;
+      const vertexCount = 6;
+      gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
+    }
+  }
+  // gl.popMatrix();
 }
 
 const BIGMYSTERY = 1800.0;
@@ -282,4 +414,34 @@ export function updateSpark(global: GlobalInfo, flurry: FlurryInfo, s: Spark) {
   for (let i = 0; i < 3; i++) {
     s.delta[i] = (s.position[i] - old[i]) / flurry.fDeltaTime;
   }
+}
+
+export function initSparkBuffers(global: GlobalInfo): void {
+  const gl = global.gl;
+
+  const program = initShaderProgram(global.gl);
+
+  const programInfo = {
+    program,
+    attribLocations: {
+      vertexPosition: gl.getAttribLocation(program, 'aVertexPosition'),
+    },
+    uniformLocations: {
+      projectionMatrix: gl.getUniformLocation(program, 'uProjectionMatrix'),
+      modelViewMatrix: gl.getUniformLocation(program, 'uModelViewMatrix'),
+    },
+  };
+
+  const vertices = new Float32Array(6 * 2);
+  const verticesBuffer = initBuffer(global.gl, vertices);
+
+  if (global.debug == null) {
+    global.debug = {};
+  }
+
+  global.debug.spark = {
+    vertices,
+    verticesBuffer,
+    programInfo,
+  };
 }

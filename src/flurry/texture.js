@@ -140,7 +140,7 @@ function averageLastAndFirstTextures() {
 }
 
 //: GLuint
-export function makeTexture(): number {
+export function makeTexture(gl: WebGLRenderingContext): number {
   //   GLuint theTexture = 0;
   let theTexture = 0;
   for (let i = 0; i < 8; i++) {
@@ -154,34 +154,34 @@ export function makeTexture(): number {
     }
   }
 
-  // TODO
-  //   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  // // TODO
+  // gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
 
-  //   glGenTextures(1, theTexture);
-  //   glBindTexture(GL_TEXTURE_2D, theTexture);
+  // gl.genTextures(1, theTexture);
+  // gl.bindTexture(gl.TEXTURE_2D, theTexture);
 
-  //   /* Set the tiling mode (this is generally always GL_REPEAT). */
-  //   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  //   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  // /* Set the tiling mode (this is generally always GL_REPEAT). */
+  // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+  // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
 
-  //   /* Set the filtering. */
-  //   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  //   glTexParameteri(
-  //     GL_TEXTURE_2D,
-  //     GL_TEXTURE_MIN_FILTER,
-  //     GL_LINEAR_MIPMAP_NEAREST,
-  //   );
+  // /* Set the filtering. */
+  // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  // gl.texParameteri(
+  //   gl.TEXTURE_2D,
+  //   gl.TEXTURE_MIN_FILTER,
+  //   gl.LINEAR_MIPMAP_NEAREST,
+  // );
 
-  //   gluBuild2DMipmaps(
-  //     GL_TEXTURE_2D,
-  //     2,
-  //     256,
-  //     256,
-  //     GL_LUMINANCE_ALPHA,
-  //     GL_UNSIGNED_BYTE,
-  //     bigTextureArray,
-  //   );
-  //   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+  // glu.Build2DMipmaps(
+  //   gl.TEXTURE_2D,
+  //   2,
+  //   256,
+  //   256,
+  //   gl.LUMINANCE_ALPHA,
+  //   gl.UNSIGNED_BYTE,
+  //   bigTextureArray,
+  // );
+  // gl.texEnvf(gl.TEXTURE_ENV, gl.TEXTURE_ENV_MODE, gl.MODULATE);
 
   return theTexture;
 }

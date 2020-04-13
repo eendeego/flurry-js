@@ -46,7 +46,7 @@ export function newGlobal(
     /* system values */
     // glx_context: GLXContext,
     // window: Window,
-    renderingContext,
+    gl: renderingContext.gl,
     // canvas: HTMLCanvasElement,
 
     // Only one supported in JS
@@ -56,7 +56,7 @@ export function newGlobal(
     sys_glHeight: renderingContext.height,
 
     gTimeCounter: Date.now(),
-    first: true,
+    frameCounter: 0,
     oldFrameTime: -1,
 
     flurry: null,

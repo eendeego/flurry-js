@@ -44,23 +44,60 @@ import {
   randFlt,
 } from './flurry-h';
 
+import {mat4} from 'gl-matrix';
+import {initBuffer} from '../webgl/buffers';
+import {initShaderProgram} from '../webgl/shaders';
+
 // #define MAXANGLES 16384
 // #define NOT_QUITE_DEAD 3
 
 // #define intensity 75000.0f;
 
-export function initSmoke(): SmokeV {
+export function initSmoke(gl: WebGLRenderingContext): SmokeV {
+  const program = initShaderProgram(gl);
+
+  console.log('---- programInfo...');
+  const programInfo = {
+    program,
+    attribLocations: {
+      vertexPosition: gl.getAttribLocation(program, 'aVertexPosition'),
+    },
+    uniformLocations: {
+      projectionMatrix: gl.getUniformLocation(program, 'uProjectionMatrix'),
+      modelViewMatrix: gl.getUniformLocation(program, 'uModelViewMatrix'),
+    },
+  };
+
+  const seraphimVertices = new Float32Array((NUMSMOKEPARTICLES * 2 + 1) * 4);
+  const seraphimVerticesBuffer = initBuffer(gl, seraphimVertices);
+  const seraphimColors = new Float32Array((NUMSMOKEPARTICLES * 4 + 1) * 4);
+  const seraphimColorsBuffer = null; //initBuffer(gl, seraphimColors);
+  const seraphimTextures = new Float32Array(NUMSMOKEPARTICLES * 2 * 4 * 4);
+  const seraphimTexturesBuffer = null; //initBuffer(gl, seraphimTextures);
+
   return {
-    p: [],
+    p: Array.from({length: NUMSMOKEPARTICLES / 4}, (_, i) => ({
+      color: new Float32Array(4 * 4),
+      position: new Float32Array(3 * 4),
+      oldposition: new Float32Array(3 * 4),
+      delta: new Float32Array(3 * 4),
+      dead: new Uint32Array(4),
+      time: new Float32Array(4),
+      animFrame: new Uint32Array(4),
+    })),
     nextParticle: 0,
     nextSubParticle: 0,
     lastParticleTime: 0.25,
     firstTime: 1,
     frame: 0,
     old: Array.from({length: 3}, (_, i) => randFlt(-100.0, 100.0)),
-    seraphimVertices: [],
-    seraphimColors: [],
-    seraphimTextures: [],
+    seraphimVertices,
+    seraphimColors,
+    seraphimTextures,
+    seraphimVerticesBuffer,
+    seraphimColorsBuffer,
+    seraphimTexturesBuffer,
+    programInfo,
   };
 }
 
@@ -86,42 +123,42 @@ export function updateSmoke_ScalarBase(
       const deltay = dy * mag;
       const deltaz = dz * mag;
       for (let i = 0; i < flurry.numStreams; i++) {
-        s.p[s.nextParticle].delta[0][s.nextSubParticle] = deltax;
-        s.p[s.nextParticle].delta[1][s.nextSubParticle] = deltay;
-        s.p[s.nextParticle].delta[2][s.nextSubParticle] = deltaz;
-        s.p[s.nextParticle].position[0][s.nextSubParticle] = sx;
-        s.p[s.nextParticle].position[1][s.nextSubParticle] = sy;
-        s.p[s.nextParticle].position[2][s.nextSubParticle] = sz;
-        s.p[s.nextParticle].oldposition[0][s.nextSubParticle] = sx;
-        s.p[s.nextParticle].oldposition[1][s.nextSubParticle] = sy;
-        s.p[s.nextParticle].oldposition[2][s.nextSubParticle] = sz;
+        s.p[s.nextParticle].delta[0 + 4 * s.nextSubParticle] = deltax;
+        s.p[s.nextParticle].delta[1 + 4 * s.nextSubParticle] = deltay;
+        s.p[s.nextParticle].delta[2 + 4 * s.nextSubParticle] = deltaz;
+        s.p[s.nextParticle].position[0 + 4 * s.nextSubParticle] = sx;
+        s.p[s.nextParticle].position[1 + 4 * s.nextSubParticle] = sy;
+        s.p[s.nextParticle].position[2 + 4 * s.nextSubParticle] = sz;
+        s.p[s.nextParticle].oldposition[0 + 4 * s.nextSubParticle] = sx;
+        s.p[s.nextParticle].oldposition[1 + 4 * s.nextSubParticle] = sy;
+        s.p[s.nextParticle].oldposition[2 + 4 * s.nextSubParticle] = sz;
         const streamSpeedCoherenceFactor = Math.max(
           0.0,
           1.0 + randBell(0.25 * MAGIC.incohesion),
         );
         const dx =
-          s.p[s.nextParticle].position[0][s.nextSubParticle] -
+          s.p[s.nextParticle].position[0 + 4 * s.nextSubParticle] -
           flurry.spark[i].position[0];
         const dy =
-          s.p[s.nextParticle].position[1][s.nextSubParticle] -
+          s.p[s.nextParticle].position[1 + 4 * s.nextSubParticle] -
           flurry.spark[i].position[1];
         const dz =
-          s.p[s.nextParticle].position[2][s.nextSubParticle] -
+          s.p[s.nextParticle].position[2 + 4 * s.nextSubParticle] -
           flurry.spark[i].position[2];
         const f = MAGIC.streamSpeed * streamSpeedCoherenceFactor;
 
         const mag = f / Math.hypot(dx, dy, dz);
 
-        s.p[s.nextParticle].delta[0][s.nextSubParticle] -= dx * mag;
-        s.p[s.nextParticle].delta[1][s.nextSubParticle] -= dy * mag;
-        s.p[s.nextParticle].delta[2][s.nextSubParticle] -= dz * mag;
-        s.p[s.nextParticle].color[0][s.nextSubParticle] =
+        s.p[s.nextParticle].delta[0 + 4 * s.nextSubParticle] -= dx * mag;
+        s.p[s.nextParticle].delta[1 + 4 * s.nextSubParticle] -= dy * mag;
+        s.p[s.nextParticle].delta[2 + 4 * s.nextSubParticle] -= dz * mag;
+        s.p[s.nextParticle].color[0 + 4 * s.nextSubParticle] =
           flurry.spark[i].color[0] * (1.0 + randBell(MAGIC.colorIncoherence));
-        s.p[s.nextParticle].color[1][s.nextSubParticle] =
+        s.p[s.nextParticle].color[1 + 4 * s.nextSubParticle] =
           flurry.spark[i].color[1] * (1.0 + randBell(MAGIC.colorIncoherence));
-        s.p[s.nextParticle].color[2][s.nextSubParticle] =
+        s.p[s.nextParticle].color[2 + 4 * s.nextSubParticle] =
           flurry.spark[i].color[2] * (1.0 + randBell(MAGIC.colorIncoherence));
-        s.p[s.nextParticle].color[3][s.nextSubParticle] =
+        s.p[s.nextParticle].color[3 + 4 * s.nextSubParticle] =
           0.85 * (1.0 + randBell(0.5 * MAGIC.colorIncoherence));
         s.p[s.nextParticle].time[s.nextSubParticle] = flurry.fTime;
         s.p[s.nextParticle].dead[s.nextSubParticle] = 0;
@@ -158,14 +195,14 @@ export function updateSmoke_ScalarBase(
         continue;
       }
 
-      let deltax = s.p[i].delta[0][k];
-      let deltay = s.p[i].delta[1][k];
-      let deltaz = s.p[i].delta[2][k];
+      let deltax = s.p[i].delta[0 + 4 * k];
+      let deltay = s.p[i].delta[1 + 4 * k];
+      let deltaz = s.p[i].delta[2 + 4 * k];
 
       for (let j = 0; j < flurry.numStreams; j++) {
-        const dx = s.p[i].position[0][k] - flurry.spark[j].position[0];
-        const dy = s.p[i].position[1][k] - flurry.spark[j].position[1];
-        const dz = s.p[i].position[2][k] - flurry.spark[j].position[2];
+        const dx = s.p[i].position[0 + 4 * k] - flurry.spark[j].position[0];
+        const dy = s.p[i].position[1 + 4 * k] - flurry.spark[j].position[1];
+        const dz = s.p[i].position[2 + 4 * k] - flurry.spark[j].position[2];
         const rsquared = dx * dx + dy * dy + dz * dz;
 
         let f = (MAGIC.gravity / rsquared) * frameRateModifier;
@@ -191,12 +228,13 @@ export function updateSmoke_ScalarBase(
       }
 
       /* update the position */
-      s.p[i].delta[0][k] = deltax;
-      s.p[i].delta[1][k] = deltay;
-      s.p[i].delta[2][k] = deltaz;
+      s.p[i].delta[0 + 4 * k] = deltax;
+      s.p[i].delta[1 + 4 * k] = deltay;
+      s.p[i].delta[2 + 4 * k] = deltaz;
       for (let j = 0; j < 3; j++) {
-        s.p[i].oldposition[j][k] = s.p[i].position[j][k];
-        s.p[i].position[j][k] += s.p[i].delta[j][k] * flurry.fDeltaTime;
+        s.p[i].oldposition[j + 4 * k] = s.p[i].position[j + 4 * k];
+        s.p[i].position[j + 4 * k] +=
+          s.p[i].delta[j + 4 * k] * flurry.fDeltaTime;
       }
     }
   }
@@ -238,10 +276,10 @@ export function drawSmoke_Scalar(
         s.p[i].dead[k] = 1;
         continue;
       }
-      z = s.p[i].position[2][k];
-      sx = (s.p[i].position[0][k] * global.sys_glWidth) / z + wslash2;
-      sy = (s.p[i].position[1][k] * global.sys_glWidth) / z + hslash2;
-      oldz = s.p[i].oldposition[2][k];
+      z = s.p[i].position[2 + 4 * k];
+      sx = (s.p[i].position[0 + 4 * k] * global.sys_glWidth) / z + wslash2;
+      sy = (s.p[i].position[1 + 4 * k] * global.sys_glWidth) / z + hslash2;
+      oldz = s.p[i].oldposition[2 + 4 * k];
       if (
         sx > global.sys_glWidth + 50.0 ||
         sx < -50.0 ||
@@ -255,8 +293,8 @@ export function drawSmoke_Scalar(
 
       w = Math.max(1.0, thisWidth / z);
       {
-        const oldx = s.p[i].oldposition[0][k];
-        const oldy = s.p[i].oldposition[1][k];
+        const oldx = s.p[i].oldposition[0 + 4 * k];
+        const oldy = s.p[i].oldposition[1 + 4 * k];
         const oldscreenx = (oldx * global.sys_glWidth) / oldz + wslash2;
         const oldscreeny = (oldy * global.sys_glWidth) / oldz + hslash2;
         const dx = sx - oldscreenx;
@@ -303,10 +341,10 @@ export function drawSmoke_Scalar(
           si++;
           cm *= brightness;
           const cmv = [
-            s.p[i].color[0][k] * cm,
-            s.p[i].color[1][k] * cm,
-            s.p[i].color[2][k] * cm,
-            s.p[i].color[3][k] * cm,
+            s.p[i].color[0 + 4 * k] * cm,
+            s.p[i].color[1 + 4 * k] * cm,
+            s.p[i].color[2 + 4 * k] * cm,
+            s.p[i].color[3 + 4 * k] * cm,
           ];
 
           // #if 0
@@ -319,7 +357,7 @@ export function drawSmoke_Scalar(
           } else {
             for (let jj = 0; jj < 4; jj++) {
               for (let ii = 0; ii < 4; ii++) {
-                s.seraphimColors[sci][ii] = cmv[ii];
+                s.seraphimColors[sci + 4 * ii] = cmv[ii];
               }
               sci += 1;
             }
@@ -335,24 +373,169 @@ export function drawSmoke_Scalar(
           s.seraphimTextures[sti++] = u1;
           s.seraphimTextures[sti++] = v0;
 
-          s.seraphimVertices[svi][0] = sx + dxm - dys;
-          s.seraphimVertices[svi][1] = sy + dym + dxs;
-          s.seraphimVertices[svi][2] = sx + dxm + dys;
-          s.seraphimVertices[svi][3] = sy + dym - dxs;
+          s.seraphimVertices[svi + 4 * 0] = sx + dxm - dys;
+          s.seraphimVertices[svi + 4 * 1] = sy + dym + dxs;
+          s.seraphimVertices[svi + 4 * 2] = sx + dxm + dys;
+          s.seraphimVertices[svi + 4 * 3] = sy + dym - dxs;
           svi++;
 
-          s.seraphimVertices[svi][0] = oldscreenx - dxm + dyos;
-          s.seraphimVertices[svi][1] = oldscreeny - dym - dxos;
-          s.seraphimVertices[svi][2] = oldscreenx - dxm - dyos;
-          s.seraphimVertices[svi][3] = oldscreeny - dym + dxos;
+          s.seraphimVertices[svi + 4 * 0] = oldscreenx - dxm + dyos;
+          s.seraphimVertices[svi + 4 * 1] = oldscreeny - dym - dxos;
+          s.seraphimVertices[svi + 4 * 2] = oldscreenx - dxm - dyos;
+          s.seraphimVertices[svi + 4 * 3] = oldscreeny - dym + dxos;
           svi++;
         }
       }
     }
   }
+
+  // TODO DEBUG
+  if (0 === 1) {
+    console.log(si);
+  }
+
+  window.seraphimColors = s.seraphimColors;
+  window.seraphimVertices = s.seraphimVertices;
+  window.seraphimTextures = s.seraphimTextures;
+
+  // console.log({
+  //   seraphimColors: {
+  //     x: s.seraphimColors[4 + 0],
+  //     y: s.seraphimColors[4 + 1],
+  //     z: s.seraphimColors[4 + 2],
+  //     a: s.seraphimColors[4 + 3],
+  //   },
+  //   seraphimVertices: {
+  //     x: s.seraphimVertices[4 + 0],
+  //     y: s.seraphimVertices[4 + 1],
+  //     z: s.seraphimVertices[4 + 2],
+  //     a: s.seraphimVertices[4 + 3],
+  //   },
+  //   seraphimTextures: {
+  //     x: s.seraphimTextures[4 + 0],
+  //     y: s.seraphimTextures[4 + 1],
+  //     z: s.seraphimTextures[4 + 2],
+  //     a: s.seraphimTextures[4 + 3],
+  //   },
+  // });
   // // TODO
-  // glColorPointer(4, GL_FLOAT, 0, s.seraphimColors);
-  // glVertexPointer(2, GL_FLOAT, 0, s.seraphimVertices);
-  // glTexCoordPointer(2, GL_FLOAT, 0, s.seraphimTextures);
-  // glDrawArrays(GL_QUADS, 0, si * 4);
+  // const gl = global.gl;
+  // gl.colorPointer(4, gl.FLOAT, 0, s.seraphimColors);
+  // gl.vertexPointer(2, gl.FLOAT, 0, s.seraphimVertices);
+  // gl.texCoordPointer(2, gl.FLOAT, 0, s.seraphimTextures);
+  // gl.drawArrays(gl.QUADS, 0, si * 4);
+
+  drawSeraphim(global);
+}
+
+let painted = false;
+
+function drawSeraphim(global: GlobalInfo): void {
+  if (painted) {
+    return;
+  } else {
+    painted = true;
+  }
+
+  const {
+    gl,
+    flurry: {
+      s: {seraphimVertices, seraphimVerticesBuffer, programInfo},
+    },
+  } = global;
+
+  console.log('---- gl.clearColor...');
+  gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
+  gl.clearDepth(1.0); // Clear everything
+  gl.enable(gl.DEPTH_TEST); // Enable depth testing
+  gl.depthFunc(gl.LEQUAL); // Near things obscure far things
+
+  // Clear the canvas before we start drawing on it.
+
+  console.log('---- gl.clear');
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  const fieldOfView = (45 * Math.PI) / 180; // in radians
+  const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+  console.log('---- aspect: ' + aspect);
+  const zNear = 0.1;
+  const zFar = 100.0;
+  const projectionMatrix = mat4.create();
+
+  // note: glmatrix.js always has the first argument
+  // as the destination to receive the result.
+  mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
+
+  // Set the drawing position to the "identity" point, which is
+  // the center of the scene.
+  const modelViewMatrix = mat4.create();
+
+  // Now move the drawing position a bit to where we want to
+  // start drawing the square.
+
+  mat4.translate(
+    modelViewMatrix, // destination matrix
+    modelViewMatrix, // matrix to translate
+    [-0.0, 0.0, -6.0],
+  ); // amount to translate
+
+  // TODO DEBUG
+  {
+    let i = 0;
+    seraphimVertices[i++] = 1.0;
+    seraphimVertices[i++] = 1.0;
+    seraphimVertices[i++] = -1.0;
+    seraphimVertices[i++] = 1.0;
+    seraphimVertices[i++] = 1.0;
+    seraphimVertices[i++] = -1.0;
+    seraphimVertices[i++] = -1.0;
+    seraphimVertices[i++] = -1.0;
+  }
+  gl.bufferData(gl.ARRAY_BUFFER, seraphimVertices, gl.STATIC_DRAW);
+
+  // Tell WebGL how to pull out the positions from the position
+  // buffer into the vertexPosition attribute.
+  {
+    const numComponents = 2;
+    const type = gl.FLOAT;
+    const normalize = false;
+    const stride = 0;
+    const offset = 0;
+    if (programInfo == null) {
+      debugger;
+    }
+    gl.bindBuffer(gl.ARRAY_BUFFER, seraphimVerticesBuffer);
+    gl.vertexAttribPointer(
+      programInfo.attribLocations.vertexPosition,
+      numComponents,
+      type,
+      normalize,
+      stride,
+      offset,
+    );
+    gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
+  }
+
+  // Tell WebGL to use our program when drawing
+
+  gl.useProgram(programInfo.program);
+
+  // Set the shader uniforms
+
+  gl.uniformMatrix4fv(
+    programInfo.uniformLocations.projectionMatrix,
+    false,
+    projectionMatrix,
+  );
+  gl.uniformMatrix4fv(
+    programInfo.uniformLocations.modelViewMatrix,
+    false,
+    modelViewMatrix,
+  );
+
+  {
+    const offset = 0;
+    const vertexCount = 4;
+    gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
+  }
 }

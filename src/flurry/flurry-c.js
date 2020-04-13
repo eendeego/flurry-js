@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import type {GlobalInfo} from './types';
 
+// TODO Move to a value inside global
 export function timeInSecondsSinceStart(global: GlobalInfo): number {
   return Date.now() - global.gTimeCounter;
 }

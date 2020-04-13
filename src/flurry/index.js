@@ -38,46 +38,85 @@ import type {PresetNumType} from './preset-num';
 import type {FlurryInfo, GlobalInfo} from './types';
 
 import ColorModes from './color-modes';
-import OptimizationModes from './optimization-modes';
 import {timeInSecondsSinceStart} from './flurry-c';
 import {DRAW_SPARKS} from './flurry-h';
 import {newFlurryInfo} from './flurry-info';
 import {PresetNum} from './preset-num';
 import {drawSmoke_Scalar, updateSmoke_ScalarBase} from './smoke';
-import {drawSpark, updateSpark} from './spark';
+import {drawSpark, updateSpark, initSparkBuffers} from './spark';
 import {updateStar} from './star';
 import {makeTexture} from './texture';
 
 export const DEF_PRESET = 'random';
 
 export function GLSetupRC(global: GlobalInfo): void {
+  // const gl = global.gl;
   // TODO
-  //   /* setup the defaults for OpenGL */
-  //   glDisable(GL_DEPTH_TEST);
-  //   glAlphaFunc(GL_GREATER, 0.0);
-  //   glEnable(GL_ALPHA_TEST);
-  //   glShadeModel(GL_FLAT);
-  //   glDisable(GL_LIGHTING);
-  //   glDisable(GL_CULL_FACE);
-  //   glEnable(GL_BLEND);
-  //   glViewport(0, 0, global.sys_glWidth, global.sys_glHeight);
-  //   glMatrixMode(GL_PROJECTION);
-  //   glLoadIdentity();
-  //   glOrtho(0, global.sys_glWidth, 0, global.sys_glHeight, -1, 1);
-  //   glMatrixMode(GL_MODELVIEW);
-  //   glLoadIdentity();
-  //   glClear(GL_COLOR_BUFFER_BIT);
-  //   glEnableClientState(GL_COLOR_ARRAY);
-  //   glEnableClientState(GL_VERTEX_ARRAY);
-  //   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  /* setup the defaults for OpenGL */
+  // gl.disable(gl.DEPTH_TEST); // webgl-safe
+  // // gl.alphaFunc(gl.GREATER, 0.0);
+  // // gl.enable(gl.ALPHA_TEST);
+  // // gl.shadeModel(gl.FLAT);
+  // // gl.disable(gl.LIGHTING);
+  // gl.disable(gl.CULL_FACE); // webgl-safe
+  // gl.enable(gl.BLEND); // webgl-safe
+  // gl.viewport(0, 0, global.sys_glWidth, global.sys_glHeight); // webgl-safe
+  // // gl.matrixMode(gl.PROJECTION);
+  // // gl.loadIdentity();
+  // // gl.ortho(0, global.sys_glWidth, 0, global.sys_glHeight, -1, 1);
+  // // gl.matrixMode(gl.MODELVIEW);
+  // // gl.loadIdentity();
+  // gl.clear(gl.COLOR_BUFFER_BIT); // webgl-safe
+  // // gl.enableClientState(gl.COLOR_ARRAY);
+  // // gl.enableClientState(gl.VERTEX_ARRAY);
+  // // gl.enableClientState(gl.TEXTURE_COORD_ARRAY);
+
+  // Buffer initialization is performed in initSmoke (called from initFlurry)
+
+  if (DRAW_SPARKS) {
+    initSparkBuffers(global);
+  }
 }
+
+// const updateSmoke = (function () {
+//   switch (global.optMode) {
+//     case OptimizationModes.OPT_MODE_SCALAR_BASE:
+//       return updateSmoke_ScalarBase;
+//     // case OptimizationModes.OPT_MODE_SCALAR_FRSQRTE:
+//     //   UpdateSmoke_ScalarFrsqrte(global, flurry, flurry.s);
+//     //   break;
+//     // case OptimizationModes.OPT_MODE_VECTOR_SIMPLE:
+//     //   UpdateSmoke_VectorBase(global, flurry, flurry.s);
+//     //   break;
+//     // case OptimizationModes.OPT_MODE_VECTOR_UNROLLED:
+//     //   UpdateSmoke_VectorUnrolled(global, flurry, flurry.s);
+//     //   break;
+//     default:
+//       throw new Error("Unsupported optMode: " + global.optMode);
+//   }
+// })();
+
+// const drawSmoke = (function () {
+//   switch (global.optMode) {
+//     case OptimizationModes.OPT_MODE_SCALAR_BASE:
+//       // case OptimizationModes.OPT_MODE_SCALAR_FRSQRTE:
+//       return drawSmoke_Scalar;
+//     // case OptimizationModes.OPT_MODE_VECTOR_SIMPLE:
+//     // case OptimizationModes.OPT_MODE_VECTOR_UNROLLED:
+//     //   DrawSmoke_Vector(global, flurry, flurry.s, b);
+//     //   break;
+//     default:
+//       throw new Error("Unsupported optMode: " + global.optMode);
+//   }
+// })();
 
 export function GLRenderScene(
   global: GlobalInfo,
   flurry: FlurryInfo,
   b: number,
 ): void {
-  //     int i;
+  // const gl = global.gl;
+
   flurry.dframe++;
   flurry.fOldTime = flurry.fTime;
   flurry.fTime = timeInSecondsSinceStart(global) + flurry.flurryRandomSeed;
@@ -87,56 +126,31 @@ export function GLRenderScene(
   // #ifdef DRAW_SPARKS
   if (DRAW_SPARKS) {
     // TODO
-    // glShadeModel(GL_SMOOTH);
-    // glEnable(GL_BLEND);
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    // gl.shadeModel(gl.SMOOTH);
+    // gl.enable(gl.BLEND);
+    // gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
   }
+
   for (let i = 0; i < flurry.numStreams; i++) {
     flurry.spark[i].color[0] = 1.0;
     flurry.spark[i].color[1] = 1.0;
     flurry.spark[i].color[2] = 1.0;
-    flurry.spark[i].color[2] = 1.0;
+    flurry.spark[i].color[2] = 1.0; // TODO Bug?
     updateSpark(global, flurry, flurry.spark[i]);
+
     // #ifdef DRAW_SPARKS
     if (DRAW_SPARKS) {
       drawSpark(global, flurry, flurry.spark[i]);
     }
   }
-  switch (global.optMode) {
-    case OptimizationModes.OPT_MODE_SCALAR_BASE:
-      updateSmoke_ScalarBase(global, flurry, flurry.s);
-      break;
-    // case OptimizationModes.OPT_MODE_SCALAR_FRSQRTE:
-    //   UpdateSmoke_ScalarFrsqrte(global, flurry, flurry.s);
-    //   break;
-    // case OptimizationModes.OPT_MODE_VECTOR_SIMPLE:
-    //   UpdateSmoke_VectorBase(global, flurry, flurry.s);
-    //   break;
-    // case OptimizationModes.OPT_MODE_VECTOR_UNROLLED:
-    //   UpdateSmoke_VectorUnrolled(global, flurry, flurry.s);
-    //   break;
-    default:
-      break;
-  }
-  // TODO
-  //   /* glDisable(GL_BLEND); */
-  //   glEnable(GL_BLEND);
-  //   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-  //   glEnable(GL_TEXTURE_2D);
-  switch (global.optMode) {
-    case OptimizationModes.OPT_MODE_SCALAR_BASE:
-      // case OptimizationModes.OPT_MODE_SCALAR_FRSQRTE:
-      drawSmoke_Scalar(global, flurry, flurry.s, b);
-      break;
-    // case OptimizationModes.OPT_MODE_VECTOR_SIMPLE:
-    // case OptimizationModes.OPT_MODE_VECTOR_UNROLLED:
-    //   DrawSmoke_Vector(global, flurry, flurry.s, b);
-    //   break;
-    default:
-      break;
-  }
-  // TODO
-  //   glDisable(GL_TEXTURE_2D);
+  updateSmoke_ScalarBase(global, flurry, flurry.s);
+
+  /* glDisable(gl.BLEND); */
+  // gl.enable(gl.BLEND);
+  // gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+  // gl.enable(gl.TEXTURE_2D);
+  drawSmoke_Scalar(global, flurry, flurry.s, b);
+  // gl.disable(gl.TEXTURE_2D);
 }
 
 export function GLResize(global: GlobalInfo, w: number, h: number): void {
@@ -144,53 +158,56 @@ export function GLResize(global: GlobalInfo, w: number, h: number): void {
   global.sys_glHeight = h;
 }
 
-// TODO add physical config argument
+const presetStr2PresetNum = {
+  water: PresetNum.PRESET_WATER,
+  fire: PresetNum.PRESET_FIRE,
+  psychedelic: PresetNum.PRESET_PSYCHEDELIC,
+  rgb: PresetNum.PRESET_RGB,
+  binary: PresetNum.PRESET_BINARY,
+  classic: PresetNum.PRESET_CLASSIC,
+  insane: PresetNum.PRESET_INSANE,
+};
+function presetStr2Num(presetStr: string): PresetNumType {
+  if (presetStr == null || presetStr === '') {
+    return presetStr2Num(DEF_PRESET);
+  }
+
+  if (presetStr === 'random') {
+    return ((Math.round(
+      Math.random() * PresetNum.PRESET_MAX,
+    ): any): PresetNumType);
+  }
+
+  if (presetStr2PresetNum[presetStr] != null) {
+    return presetStr2PresetNum[presetStr];
+  }
+
+  console.log(`unknown preset ${presetStr}`);
+}
+
 /* new window size or exposure */
 export function reshapeFlurry(global: GlobalInfo) {
-  // TODO
-  //   glXMakeCurrent(MI_DISPLAY(mi), global.window, global.glx_context);
-  //   glViewport(0.0, 0.0, global.sys_glWidth, global.sys_glHeight);
-  //   glMatrixMode(GL_PROJECTION);
-  //   glLoadIdentity();
-  //   glOrtho(0, global.sys_glWidth, 0, global.sys_glHeight, -1, 1);
-  //   glMatrixMode(GL_MODELVIEW);
-  //   glClear(GL_COLOR_BUFFER_BIT);
-  //   glFlush();
-  //   GLResize(global, global.sys_glWidth, global.sys_glHeight);
+  // const gl = global.gl;
+  // // TODO
+  // // gl.makeCurrent(MI_DISPLAY(mi), global.window, global.glx_context);
+  // gl.viewport(0.0, 0.0, global.sys_glWidth, global.sys_glHeight);
+  // // gl.matrixMode(gl.PROJECTION);
+  // // gl.loadIdentity();
+  // // gl.ortho(0, global.sys_glWidth, 0, global.sys_glHeight, -1, 1);
+  // // gl.matrixMode(gl.MODELVIEW);
+  // gl.clear(gl.COLOR_BUFFER_BIT);
+  // gl.flush();
+  GLResize(global, global.sys_glWidth, global.sys_glHeight);
 }
 
 // TODO add physical config argument
 export function initFlurry(global: GlobalInfo, presetStr: ?string) {
-  let presetNum: PresetNumType;
-
   global.gTimeCounter = Date.now();
 
   global.flurry = null;
 
-  if (presetStr == null || presetStr === '') {
-    presetStr = DEF_PRESET;
-  }
-  if (presetStr === 'random') {
-    presetNum = ((Math.round(
-      Math.random() * PresetNum.PRESET_MAX,
-    ): any): PresetNumType);
-  } else if (presetStr === 'water') {
-    presetNum = PresetNum.PRESET_WATER;
-  } else if (presetStr === 'fire') {
-    presetNum = PresetNum.PRESET_FIRE;
-  } else if (presetStr === 'psychedelic') {
-    presetNum = PresetNum.PRESET_PSYCHEDELIC;
-  } else if (presetStr === 'rgb') {
-    presetNum = PresetNum.PRESET_RGB;
-  } else if (presetStr === 'binary') {
-    presetNum = PresetNum.PRESET_BINARY;
-  } else if (presetStr === 'classic') {
-    presetNum = PresetNum.PRESET_CLASSIC;
-  } else if (presetStr === 'insane') {
-    presetNum = PresetNum.PRESET_INSANE;
-  } else {
-    console.log(`unknown preset ${presetStr}`);
-  }
+  const presetNum = presetStr2Num(presetStr);
+
   switch (presetNum) {
     case PresetNum.PRESET_WATER: {
       for (let i = 0; i < 9; i++) {
@@ -316,7 +333,7 @@ export function initFlurry(global: GlobalInfo, presetStr: ?string) {
       break;
     }
     default: {
-      console.log(`unknown preset ${presetStr}`);
+      console.log(`unknown preset ${presetStr} | ${presetNum}`);
     }
   }
 
@@ -327,19 +344,18 @@ export function initFlurry(global: GlobalInfo, presetStr: ?string) {
   //     // // TODO
   //     // MI_CLEARWINDOW(mi);
   //   }
-  global.first = true;
   global.oldFrameTime = -1;
 }
 
-// TODO Add physical ...
 export function drawFlurry(global: GlobalInfo): void {
-  let deltaFrameTime = 0;
-  // double brite;
-  let alpha;
+  const gl = global.gl;
 
-  // flurry_info_t *flurry;
-  // Display    *display = MI_DISPLAY(mi);
-  // Window      window = MI_WINDOW(mi);
+  if (global.flurry?.s?.programInfo == null) {
+    debugger;
+  }
+
+  let deltaFrameTime = 0;
+  let alpha;
 
   const newFrameTime = Date.now();
   if (global.oldFrameTime === -1) {
@@ -355,6 +371,7 @@ export function drawFlurry(global: GlobalInfo): void {
      * than that and the blending causes the display to
      * saturate, which looks really ugly.
      */
+    // TODO
     // if (newFrameTime - global.oldFrameTime < 1 / 60.0) {
     //   usleep(MAX_(1, int(20000 * (newFrameTime - global.oldFrameTime))));
     //   return;
@@ -366,29 +383,38 @@ export function drawFlurry(global: GlobalInfo): void {
 
   if (alpha > 0.2) alpha = 0.2;
 
+  // TODO
   //   if (!global.glx_context) return;
 
-  if (global.first) {
-    global.texid = makeTexture();
-    global.first = false;
+  if (global.frameCounter === 0) {
+    global.texid = makeTexture(gl);
   }
 
-  // glDrawBuffer(GL_BACK);
-  // glXMakeCurrent(display, window, *global.glx_context);
+  // TODO
+  // gl.drawBuffer(gl.BACK);
+  // gl.xMakeCurrent(display, window, *global.glx_context);
 
-  // glEnable(GL_BLEND);
-  // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  // TODO (works in webgl!)
+  // gl.enable(gl.BLEND);
+  // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-  // glColor4f(0.0, 0.0, 0.0, alpha);
-  // glRectd(0, 0, global.sys_glWidth, global.sys_glHeight);
+  // TODONE
+  // gl.color4f(0.0, 0.0, 0.0, alpha);
+  // gl.rectd(0, 0, global.sys_glWidth, global.sys_glHeight);
+  // gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  // gl.clear(gl.COLOR_BUFFER_BIT);
 
-  // brite = pow(deltaFrameTime,0.75) * 10;
-  // for (flurry = global.flurry; flurry; flurry=flurry.next) {
-  // GLRenderScene(global, flurry, brite * flurry.briteFactor);
-  // }
+  const brite = Math.pow(deltaFrameTime, 0.75) * 10;
+  for (let flurry = global.flurry; flurry; flurry = flurry.next) {
+    GLRenderScene(global, flurry, brite * flurry.briteFactor);
+  }
 
+  // TODO
   // if (mi.fps_p) do_fps (mi);
 
-  // glFinish();
-  // glXSwapBuffers(display, window);
+  // TODO
+  // gl.finish();
+  // gl.xSwapBuffers(display, window);
+
+  global.frameCounter++;
 }

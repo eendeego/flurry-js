@@ -67,7 +67,7 @@ export function newFlurryInfo(
   const dframe = 0;
   const fTime = timeInSecondsSinceStart(global) + flurryRandomSeed;
 
-  const smoke = initSmoke();
+  const smoke = initSmoke(global.gl);
   for (let i = 0; i < NUMSMOKEPARTICLES / 4; i++) {
     for (let k = 0; k < 4; k++) {
       smoke.p[i].dead[k] = 1;
