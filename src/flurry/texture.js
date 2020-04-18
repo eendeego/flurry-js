@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // @flow strict
 
-import {initTexture} from '../webgl/textures';
+import {initTexture} from '../webgl/seraphim-textures';
 
 const smallTextureArray = new Uint8ClampedArray(32 * 32 * 2);
 const bigTextureArray = new Uint8ClampedArray(256 * 256 * 2);
