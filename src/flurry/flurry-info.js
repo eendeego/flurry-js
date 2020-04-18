@@ -21,7 +21,7 @@ export function deleteFlurryInfo(flurry: FlurryInfo): void {
   /* free(flurry); */
 }
 
-export function newFlurryInfo(
+export function createFlurry(
   global: GlobalInfo,
   streams: number,
   colour: ColorModesType,
@@ -42,7 +42,6 @@ export function newFlurryInfo(
   }
 
   const flurry = {
-    next: null,
     currentColorMode: colour,
     s: smoke,
     star: initStar(speed),

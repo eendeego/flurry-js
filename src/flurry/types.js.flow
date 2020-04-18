@@ -1,7 +1,6 @@
 // @flow strict
 
 import type {ColorModesType} from './color-modes';
-import type {OptimizationModesType} from './optimization-modes';
 
 export type ProgramInfo = {
   program: WebGLProgram,
@@ -61,7 +60,6 @@ export type Spark = {|
 |};
 
 export type FlurryInfo = {|
-  next: ?FlurryInfo,
   currentColorMode: ColorModesType,
   s: SmokeV,
   star: Star,
@@ -79,12 +77,7 @@ export type FlurryInfo = {|
 
 export type GlobalInfo = {|
   /* system values */
-  // glx_context: GLXContext,
-  // window: Window,
   gl: WebGLRenderingContext,
-  // canvas: HTMLCanvasElement,
-  optMode: OptimizationModesType,
-
   sys_glWidth: number,
   sys_glHeight: number,
 
@@ -93,7 +86,7 @@ export type GlobalInfo = {|
   frameCounter: number,
   oldFrameTime: number,
 
-  flurry: ?FlurryInfo,
+  flurries: $ReadOnlyArray<FlurryInfo>,
   texid: WebGLTexture, // GLuint
 
   // Only used if DRAW_SPARKS is true

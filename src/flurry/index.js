@@ -7,9 +7,9 @@ import type {FlurryInfo, GlobalInfo} from './types';
 
 import ColorModes from './color-modes';
 import {DEF_PRESET, DRAW_SPARKS} from './constants';
-import {newFlurryInfo} from './flurry-info';
+import {createFlurry} from './flurry-info';
 import {PresetNum} from './preset-num';
-import {drawSmoke_Scalar, updateSmoke_ScalarBase} from './smoke';
+import {drawSmoke, updateSmoke} from './smoke';
 import {drawSpark, updateSpark} from './spark';
 // import {drawSpark, updateSpark, initSparkBuffers} from "./spark";
 import {updateStar} from './star';
@@ -19,38 +19,6 @@ import nullthrows from 'nullthrows';
 export function currentTime(): number {
   return Date.now() * 0.001;
 }
-
-// const updateSmoke = (function () {
-//   switch (global.optMode) {
-//     case OptimizationModes.OPT_MODE_SCALAR_BASE:
-//       return updateSmoke_ScalarBase;
-//     // case OptimizationModes.OPT_MODE_SCALAR_FRSQRTE:
-//     //   UpdateSmoke_ScalarFrsqrte(global, flurry, flurry.s);
-//     //   break;
-//     // case OptimizationModes.OPT_MODE_VECTOR_SIMPLE:
-//     //   UpdateSmoke_VectorBase(global, flurry, flurry.s);
-//     //   break;
-//     // case OptimizationModes.OPT_MODE_VECTOR_UNROLLED:
-//     //   UpdateSmoke_VectorUnrolled(global, flurry, flurry.s);
-//     //   break;
-//     default:
-//       throw new Error("Unsupported optMode: " + global.optMode);
-//   }
-// })();
-
-// const drawSmoke = (function () {
-//   switch (global.optMode) {
-//     case OptimizationModes.OPT_MODE_SCALAR_BASE:
-//       // case OptimizationModes.OPT_MODE_SCALAR_FRSQRTE:
-//       return drawSmoke_Scalar;
-//     // case OptimizationModes.OPT_MODE_VECTOR_SIMPLE:
-//     // case OptimizationModes.OPT_MODE_VECTOR_UNROLLED:
-//     //   DrawSmoke_Vector(global, flurry, flurry.s, b);
-//     //   break;
-//     default:
-//       throw new Error("Unsupported optMode: " + global.optMode);
-//   }
-// })();
 
 function drawFlurry(global: GlobalInfo, flurry: FlurryInfo, b: number): void {
   flurry.dframe++;
@@ -82,7 +50,7 @@ function drawFlurry(global: GlobalInfo, flurry: FlurryInfo, b: number): void {
       drawSpark(global, flurry, flurry.spark[i]);
     }
   }
-  updateSmoke_ScalarBase(global, flurry, flurry.s);
+  updateSmoke(global, flurry, flurry.s);
 
   drawSmoke_Scalar(global, flurry, flurry.s, b);
 }
@@ -137,139 +105,61 @@ export function reshapeFlurry(global: GlobalInfo) {
 function flurriesFromPreset(
   global: GlobalInfo,
   preset: PresetNumType,
-): FlurryInfo {
-  let result = null;
+): Array<FlurryInfo> {
+  /**
+   * createFlurry arguments:
+   *   global: GlobalInfo,
+   *   streams: number,
+   *   colour: ColorModesType,
+   *   thickness: number,
+   *   speed: number,
+   *   bf: number,
+   */
   switch (preset) {
-    case PresetNum.PRESET_WATER: {
-      for (let i = 0; i < 9; i++) {
-        const flurry = newFlurryInfo(
+    case PresetNum.PRESET_WATER:
+      return Array.from({length: 9}, () =>
+        createFlurry(global, 1, ColorModes.blueColorMode, 100.0, 2.0, 2.0),
+      );
+    case PresetNum.PRESET_FIRE:
+      return [
+        createFlurry(
           global,
-          1,
-          ColorModes.blueColorMode,
-          100.0,
-          2.0,
-          2.0,
-        );
-        flurry.next = result;
-        result = flurry;
-      }
-      break;
-    }
-    case PresetNum.PRESET_FIRE: {
-      const flurry = newFlurryInfo(
-        global,
-        12,
-        ColorModes.slowCyclicColorMode,
-        10000.0,
-        0.2,
-        1.0,
-      );
-      flurry.next = result;
-      result = flurry;
-      break;
-    }
-    case PresetNum.PRESET_PSYCHEDELIC: {
-      const flurry = newFlurryInfo(
-        global,
-        10,
-        ColorModes.rainbowColorMode,
-        200.0,
-        2.0,
-        1.0,
-      );
-      flurry.next = result;
-      result = flurry;
-      break;
-    }
-    case PresetNum.PRESET_RGB: {
-      let flurry = newFlurryInfo(
-        global,
-        3,
-        ColorModes.redColorMode,
-        100.0,
-        0.8,
-        1.0,
-      );
-      flurry.next = result;
-      result = flurry;
-      flurry = newFlurryInfo(
-        global,
-        3,
-        ColorModes.greenColorMode,
-        100.0,
-        0.8,
-        1.0,
-      );
-      flurry.next = result;
-      result = flurry;
-      flurry = newFlurryInfo(
-        global,
-        3,
-        ColorModes.blueColorMode,
-        100.0,
-        0.8,
-        1.0,
-      );
-      flurry.next = result;
-      result = flurry;
-      break;
-    }
-    case PresetNum.PRESET_BINARY: {
-      let flurry = newFlurryInfo(
-        global,
-        16,
-        ColorModes.tiedyeColorMode,
-        1000.0,
-        0.5,
-        1.0,
-      );
-      flurry.next = result;
-      result = flurry;
-      flurry = newFlurryInfo(
-        global,
-        16,
-        ColorModes.tiedyeColorMode,
-        1000.0,
-        1.5,
-        1.0,
-      );
-      flurry.next = result;
-      result = flurry;
-      break;
-    }
-    case PresetNum.PRESET_CLASSIC: {
-      const flurry = newFlurryInfo(
-        global,
-        5,
-        ColorModes.tiedyeColorMode,
-        10000.0,
-        1.0,
-        1.0,
-      );
-      flurry.next = result;
-      result = flurry;
-      break;
-    }
-    case PresetNum.PRESET_INSANE: {
-      const flurry = newFlurryInfo(
-        global,
-        64,
-        ColorModes.tiedyeColorMode,
-        1000.0,
-        0.5,
-        0.5,
-      );
-      flurry.next = result;
-      result = flurry;
-      break;
-    }
+          12,
+          ColorModes.slowCyclicColorMode,
+          10000.0,
+          0.2,
+          1.0,
+        ),
+      ];
+    case PresetNum.PRESET_PSYCHEDELIC:
+      return [
+        createFlurry(global, 10, ColorModes.rainbowColorMode, 200.0, 2.0, 1.0),
+      ];
+    case PresetNum.PRESET_RGB:
+      return [
+        createFlurry(global, 3, ColorModes.blueColorMode, 100.0, 0.8, 1.0),
+        createFlurry(global, 3, ColorModes.greenColorMode, 100.0, 0.8, 1.0),
+        createFlurry(global, 3, ColorModes.redColorMode, 100.0, 0.8, 1.0),
+      ];
+    case PresetNum.PRESET_BINARY:
+      return [
+        createFlurry(global, 16, ColorModes.tiedyeColorMode, 1000.0, 1.5, 1.0),
+        createFlurry(global, 16, ColorModes.tiedyeColorMode, 1000.0, 0.5, 1.0),
+      ];
+    case PresetNum.PRESET_CLASSIC:
+      return [
+        createFlurry(global, 5, ColorModes.tiedyeColorMode, 10000.0, 1.0, 1.0),
+      ];
+    case PresetNum.PRESET_INSANE:
+      return [
+        createFlurry(global, 64, ColorModes.tiedyeColorMode, 1000.0, 0.5, 0.5),
+      ];
+
     default: {
       console.log(`unknown preset ${preset}`);
       throw new Error(`unknown preset ${preset}`);
     }
   }
-
-  return nullthrows(result);
 }
 
 // TODO add physical config argument
@@ -279,7 +169,7 @@ export function initFlurry(global: GlobalInfo, presetStr: ?string) {
 
   const presetNum = presetStr2Num(presetStr);
 
-  global.flurry = flurriesFromPreset(global, presetNum);
+  global.flurries = flurriesFromPreset(global, presetNum);
 
   //   if (init_GL(mi)) {
   reshapeFlurry(global);
@@ -330,7 +220,7 @@ export function renderScene(global: GlobalInfo): void {
   // const brite = Math.pow(deltaFrameTime, 0.75) * 10;
   const brite = Math.pow(deltaFrameTime, 0.75) * 10 * 5; // <= lmreis this 5 is mine
 
-  for (let flurry = global.flurry; flurry; flurry = flurry.next) {
+  for (const flurry of global.flurries) {
     drawFlurry(global, flurry, brite * flurry.briteFactor);
   }
 
