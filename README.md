@@ -31,6 +31,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ## License (BSD 3-clause)
 
 Original work Copyright (c) 2002, Calum Robinson
+
 Modified work Copyright 2020 Luis Reis
 
 All rights reserved.
