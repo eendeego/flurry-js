@@ -6,7 +6,6 @@ import type {ColorModesType} from './color-modes';
 import type {FlurryInfo, GlobalInfo} from './types';
 import {randFlt} from './random';
 
-import {timeInSecondsSinceStart} from './flurry-c';
 import {initSmoke} from './smoke';
 import {initSpark, updateSpark} from './spark';
 import {initStar} from './star';
@@ -33,7 +32,7 @@ export function newFlurryInfo(
   const flurryRandomSeed = randFlt(0.0, 300.0);
   const fOldTime = 0;
   const dframe = 0;
-  const fTime = timeInSecondsSinceStart(global) + flurryRandomSeed;
+  const fTime = global.timeInSecondsSinceStart + flurryRandomSeed;
 
   const smoke = initSmoke(global.gl);
   for (let i = 0; i < NUMSMOKEPARTICLES / 4; i++) {

@@ -88,7 +88,8 @@ export type GlobalInfo = {|
   sys_glWidth: number,
   sys_glHeight: number,
 
-  gTimeCounter: number,
+  startTime: number,
+  timeInSecondsSinceStart: number,
   frameCounter: number,
   oldFrameTime: number,
 

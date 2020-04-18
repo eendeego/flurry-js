@@ -6,7 +6,6 @@ import type {PresetNumType} from './preset-num';
 import type {FlurryInfo, GlobalInfo} from './types';
 
 import ColorModes from './color-modes';
-import {currentTime, timeInSecondsSinceStart} from './flurry-c';
 import {DEF_PRESET, DRAW_SPARKS} from './flurry-h';
 import {newFlurryInfo} from './flurry-info';
 import {PresetNum} from './preset-num';
@@ -16,6 +15,10 @@ import {drawSpark, updateSpark} from './spark';
 import {updateStar} from './star';
 import {makeTexture} from './texture';
 import {init} from '../webgl/init';
+
+export function currentTime(): number {
+  return Date.now() * 0.001;
+}
 
 export function GLSetupRC(global: GlobalInfo): void {
   init(global, DRAW_SPARKS);
@@ -57,7 +60,7 @@ function drawFlurry(global: GlobalInfo, flurry: FlurryInfo, b: number): void {
   flurry.dframe++;
 
   flurry.fOldTime = flurry.fTime;
-  flurry.fTime = timeInSecondsSinceStart(global) + flurry.flurryRandomSeed;
+  flurry.fTime = global.timeInSecondsSinceStart + flurry.flurryRandomSeed;
   flurry.fDeltaTime = flurry.fTime - flurry.fOldTime;
 
   flurry.drag = Math.pow(0.9965, flurry.fDeltaTime * 85.0);
@@ -137,7 +140,7 @@ export function reshapeFlurry(global: GlobalInfo) {
 
 // TODO add physical config argument
 export function initFlurry(global: GlobalInfo, presetStr: ?string) {
-  global.gTimeCounter = currentTime();
+  global.startTime = currentTime();
 
   global.flurry = null;
 
@@ -289,6 +292,7 @@ export function renderScene(global: GlobalInfo): void {
   let alpha;
 
   const newFrameTime = currentTime();
+  global.timeInSecondsSinceStart = newFrameTime - global.startTime;
   if (global.oldFrameTime === -1) {
     /* special case the first frame -- clear to black */
     alpha = 1.0;
