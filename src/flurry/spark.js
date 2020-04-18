@@ -5,7 +5,7 @@
 import type {FlurryInfo, GlobalInfo, Spark} from './types';
 
 import ColorModes from './color-modes';
-import {BIGMYSTERY, MAGIC, MAXANGLES} from './flurry-h';
+import {BIGMYSTERY, MAGIC, MAXANGLES} from './constants';
 import {mat4} from 'gl-matrix';
 import nullthrows from 'nullthrows';
 import {randBell, randFlt} from './random';

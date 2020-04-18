@@ -4,7 +4,7 @@
 
 import type {ProgramInfo, FlurryInfo, GlobalInfo, SmokeV} from './types';
 
-import {MAGIC, NUMSMOKEPARTICLES} from './flurry-h';
+import {MAGIC, NUMSMOKEPARTICLES} from './constants';
 import {randBell, randFlt} from './random';
 
 import {mat4} from 'gl-matrix';

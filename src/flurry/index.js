@@ -6,7 +6,7 @@ import type {PresetNumType} from './preset-num';
 import type {FlurryInfo, GlobalInfo} from './types';
 
 import ColorModes from './color-modes';
-import {DEF_PRESET, DRAW_SPARKS} from './flurry-h';
+import {DEF_PRESET, DRAW_SPARKS} from './constants';
 import {newFlurryInfo} from './flurry-info';
 import {PresetNum} from './preset-num';
 import {drawSmoke_Scalar, updateSmoke_ScalarBase} from './smoke';

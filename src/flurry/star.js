@@ -3,7 +3,7 @@
 // @flow
 
 import type {FlurryInfo, GlobalInfo, Star} from './types';
-import {BIGMYSTERY, MAGIC, MAXANGLES} from './flurry-h';
+import {BIGMYSTERY, MAGIC, MAXANGLES} from './constants';
 import {randFlt} from './random';
 
 export function initStar(rotSpeed?: number): Star {
