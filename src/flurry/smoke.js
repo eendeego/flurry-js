@@ -46,7 +46,7 @@ import {
 
 import {mat4} from 'gl-matrix';
 import {initSeraphimBuffers} from '../webgl/seraphim-buffers';
-import {initShaders} from '../webgl/shaders';
+import {initShaders} from '../webgl/seraphim-shaders';
 import nullthrows from 'nullthrows';
 
 // #define MAXANGLES 16384
