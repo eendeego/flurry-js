@@ -45,7 +45,7 @@ import {
 } from './flurry-h';
 
 import {mat4} from 'gl-matrix';
-import {initBuffers} from '../webgl/buffers';
+import {initSeraphimBuffers} from '../webgl/seraphim-buffers';
 import {initShaders} from '../webgl/shaders';
 import nullthrows from 'nullthrows';
 
@@ -66,7 +66,7 @@ export function initSmoke(gl: WebGLRenderingContext): SmokeV {
     seraphimTexturesBuffer,
     seraphimIndices,
     seraphimIndicesBuffer,
-  } = initBuffers(gl, NUMSMOKEPARTICLES);
+  } = initSeraphimBuffers(gl, NUMSMOKEPARTICLES);
 
   return {
     p: Array.from({length: NUMSMOKEPARTICLES / 4}, (_, i) => ({
