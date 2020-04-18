@@ -14,6 +14,7 @@ import {drawSpark, updateSpark} from './spark';
 // import {drawSpark, updateSpark, initSparkBuffers} from "./spark";
 import {updateStar} from './star';
 import {makeTexture} from './texture';
+import nullthrows from 'nullthrows';
 
 export function currentTime(): number {
   return Date.now() * 0.001;
@@ -133,16 +134,12 @@ export function reshapeFlurry(global: GlobalInfo) {
   GLResize(global, global.sys_glWidth, global.sys_glHeight);
 }
 
-// TODO add physical config argument
-export function initFlurry(global: GlobalInfo, presetStr: ?string) {
-  global.startTime = currentTime();
-  global.oldFrameTime = -1;
-
-  global.flurry = null;
-
-  const presetNum = presetStr2Num(presetStr);
-
-  switch (presetNum) {
+function flurriesFromPreset(
+  global: GlobalInfo,
+  preset: PresetNumType,
+): FlurryInfo {
+  let result = null;
+  switch (preset) {
     case PresetNum.PRESET_WATER: {
       for (let i = 0; i < 9; i++) {
         const flurry = newFlurryInfo(
@@ -153,8 +150,8 @@ export function initFlurry(global: GlobalInfo, presetStr: ?string) {
           2.0,
           2.0,
         );
-        flurry.next = global.flurry;
-        global.flurry = flurry;
+        flurry.next = result;
+        result = flurry;
       }
       break;
     }
@@ -167,8 +164,8 @@ export function initFlurry(global: GlobalInfo, presetStr: ?string) {
         0.2,
         1.0,
       );
-      flurry.next = global.flurry;
-      global.flurry = flurry;
+      flurry.next = result;
+      result = flurry;
       break;
     }
     case PresetNum.PRESET_PSYCHEDELIC: {
@@ -180,8 +177,8 @@ export function initFlurry(global: GlobalInfo, presetStr: ?string) {
         2.0,
         1.0,
       );
-      flurry.next = global.flurry;
-      global.flurry = flurry;
+      flurry.next = result;
+      result = flurry;
       break;
     }
     case PresetNum.PRESET_RGB: {
@@ -193,8 +190,8 @@ export function initFlurry(global: GlobalInfo, presetStr: ?string) {
         0.8,
         1.0,
       );
-      flurry.next = global.flurry;
-      global.flurry = flurry;
+      flurry.next = result;
+      result = flurry;
       flurry = newFlurryInfo(
         global,
         3,
@@ -203,8 +200,8 @@ export function initFlurry(global: GlobalInfo, presetStr: ?string) {
         0.8,
         1.0,
       );
-      flurry.next = global.flurry;
-      global.flurry = flurry;
+      flurry.next = result;
+      result = flurry;
       flurry = newFlurryInfo(
         global,
         3,
@@ -213,8 +210,8 @@ export function initFlurry(global: GlobalInfo, presetStr: ?string) {
         0.8,
         1.0,
       );
-      flurry.next = global.flurry;
-      global.flurry = flurry;
+      flurry.next = result;
+      result = flurry;
       break;
     }
     case PresetNum.PRESET_BINARY: {
@@ -226,8 +223,8 @@ export function initFlurry(global: GlobalInfo, presetStr: ?string) {
         0.5,
         1.0,
       );
-      flurry.next = global.flurry;
-      global.flurry = flurry;
+      flurry.next = result;
+      result = flurry;
       flurry = newFlurryInfo(
         global,
         16,
@@ -236,8 +233,8 @@ export function initFlurry(global: GlobalInfo, presetStr: ?string) {
         1.5,
         1.0,
       );
-      flurry.next = global.flurry;
-      global.flurry = flurry;
+      flurry.next = result;
+      result = flurry;
       break;
     }
     case PresetNum.PRESET_CLASSIC: {
@@ -249,8 +246,8 @@ export function initFlurry(global: GlobalInfo, presetStr: ?string) {
         1.0,
         1.0,
       );
-      flurry.next = global.flurry;
-      global.flurry = flurry;
+      flurry.next = result;
+      result = flurry;
       break;
     }
     case PresetNum.PRESET_INSANE: {
@@ -262,14 +259,27 @@ export function initFlurry(global: GlobalInfo, presetStr: ?string) {
         0.5,
         0.5,
       );
-      flurry.next = global.flurry;
-      global.flurry = flurry;
+      flurry.next = result;
+      result = flurry;
       break;
     }
     default: {
-      console.log(`unknown preset ${presetStr ?? '<null>'} | ${presetNum}`);
+      console.log(`unknown preset ${preset}`);
+      throw new Error(`unknown preset ${preset}`);
     }
   }
+
+  return nullthrows(result);
+}
+
+// TODO add physical config argument
+export function initFlurry(global: GlobalInfo, presetStr: ?string) {
+  global.startTime = currentTime();
+  global.oldFrameTime = -1;
+
+  const presetNum = presetStr2Num(presetStr);
+
+  global.flurry = flurriesFromPreset(global, presetNum);
 
   //   if (init_GL(mi)) {
   reshapeFlurry(global);
