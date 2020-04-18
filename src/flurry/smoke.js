@@ -68,7 +68,7 @@ export function initSmoke(gl: WebGLRenderingContext): SmokeV {
   };
 }
 
-export function updateSmoke_ScalarBase(
+export function updateSmoke(
   global: GlobalInfo,
   flurry: FlurryInfo,
   s: SmokeV,
@@ -209,7 +209,7 @@ export function updateSmoke_ScalarBase(
   }
 }
 
-export function drawSmoke_Scalar(
+export function drawSmoke(
   global: GlobalInfo,
   flurry: FlurryInfo,
   s: SmokeV,
