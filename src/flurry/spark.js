@@ -54,13 +54,11 @@ export function drawSpark(
   // const black = [0.0, 0.0, 0.0, 1.0];
   const c = 0.0625;
   {
-    const width = (60000.0 * global.sys_glWidth) / 1024.0;
+    const width = (60000.0 * global.width) / 1024.0;
 
     const z = s.position[2];
-    const sx =
-      (s.position[0] * global.sys_glWidth) / z + global.sys_glWidth * 0.5;
-    const sy =
-      (s.position[1] * global.sys_glWidth) / z + global.sys_glHeight * 0.5;
+    const sx = (s.position[0] * global.width) / z + global.width * 0.5;
+    const sy = (s.position[1] * global.width) / z + global.height * 0.5;
     const w = (width * 4.0) / z;
 
     const screenx = sx;

@@ -14,7 +14,6 @@ import {drawSpark, updateSpark} from './spark';
 // import {drawSpark, updateSpark, initSparkBuffers} from "./spark";
 import {updateStar} from './star';
 import {makeTexture} from './texture';
-import nullthrows from 'nullthrows';
 
 export function currentTime(): number {
   return Date.now() * 0.001;
@@ -56,8 +55,8 @@ function drawFlurry(global: GlobalInfo, flurry: FlurryInfo, b: number): void {
 }
 
 export function GLResize(global: GlobalInfo, w: number, h: number): void {
-  global.sys_glWidth = w;
-  global.sys_glHeight = h;
+  global.width = w;
+  global.height = h;
 }
 
 const presetStr2PresetNum = {
@@ -99,7 +98,7 @@ export function reshapeFlurry(global: GlobalInfo) {
   // // gl.matrixMode(gl.MODELVIEW);
   // gl.clear(gl.COLOR_BUFFER_BIT);
   // gl.flush();
-  GLResize(global, global.sys_glWidth, global.sys_glHeight);
+  GLResize(global, global.gl.canvas.clientWidth, global.gl.canvas.clientHeight);
 }
 
 function flurriesFromPreset(

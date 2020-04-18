@@ -219,9 +219,9 @@ export function drawSmoke(
   let sci = 0;
   let sti = 0;
   let quads = 0;
-  const screenRatio = global.sys_glWidth / 1024.0;
-  const hslash2 = global.sys_glHeight * 0.5;
-  const wslash2 = global.sys_glWidth * 0.5;
+  const screenRatio = global.width / 1024.0;
+  const hslash2 = global.height * 0.5;
+  const wslash2 = global.width * 0.5;
 
   const width = (MAGIC.streamSize + 2.5 * flurry.streamExpansion) * screenRatio;
 
@@ -240,15 +240,13 @@ export function drawSmoke(
         continue;
       }
       const z = s.p[i].position[2 * 3 + k];
-      const sx =
-        (s.p[i].position[0 * 3 + k] * global.sys_glWidth) / z + wslash2;
-      const sy =
-        (s.p[i].position[1 * 3 + k] * global.sys_glWidth) / z + hslash2;
+      const sx = (s.p[i].position[0 * 3 + k] * global.width) / z + wslash2;
+      const sy = (s.p[i].position[1 * 3 + k] * global.width) / z + hslash2;
       const oldz = s.p[i].oldposition[2 * 3 + k];
       if (
-        sx > global.sys_glWidth + 50.0 ||
+        sx > global.width + 50.0 ||
         sx < -50.0 ||
-        sy > global.sys_glHeight + 50.0 ||
+        sy > global.height + 50.0 ||
         sy < -50.0 ||
         z < 25.0 ||
         oldz < 25.0
@@ -263,8 +261,8 @@ export function drawSmoke(
       {
         const oldx = s.p[i].oldposition[0 * 3 + k];
         const oldy = s.p[i].oldposition[1 * 3 + k];
-        const oldscreenx = (oldx * global.sys_glWidth) / oldz + wslash2;
-        const oldscreeny = (oldy * global.sys_glWidth) / oldz + hslash2;
+        const oldscreenx = (oldx * global.width) / oldz + wslash2;
+        const oldscreeny = (oldy * global.width) / oldz + hslash2;
         const dx = sx - oldscreenx;
         const dy = sy - oldscreeny;
 

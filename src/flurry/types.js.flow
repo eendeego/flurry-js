@@ -78,8 +78,8 @@ export type FlurryInfo = {|
 export type GlobalInfo = {|
   /* system values */
   gl: WebGLRenderingContext,
-  sys_glWidth: number,
-  sys_glHeight: number,
+  width: number,
+  height: number,
 
   startTime: number,
   timeInSecondsSinceStart: number,

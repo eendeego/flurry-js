@@ -7,8 +7,8 @@ import type {GlobalInfo} from './types';
 export function createGlobal(gl: WebGLRenderingContext): GlobalInfo {
   return {
     gl,
-    sys_glWidth: gl.canvas.width,
-    sys_glHeight: gl.canvas.height,
+    width: gl.canvas.clientWidth,
+    height: gl.canvas.clientHeight,
 
     startTime: -1,
     timeInSecondsSinceStart: -1,
