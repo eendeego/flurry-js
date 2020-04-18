@@ -52,7 +52,7 @@ import {init} from '../webgl/init';
 export const DEF_PRESET = 'random';
 
 export function GLSetupRC(global: GlobalInfo): void {
-  init(global);
+  init(global, DRAW_SPARKS);
 }
 
 // const updateSmoke = (function () {

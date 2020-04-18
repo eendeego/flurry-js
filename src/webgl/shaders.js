@@ -55,6 +55,12 @@ const fsSource = `
     // gl_FragColor = texture2D(uSampler, vTextureCoord);
     // gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
     gl_FragColor = texture2D(uSampler, vTextureCoord) * vColor;
+
+    // glAlphaFunc(GREATER, 0.0)
+    // https://stackoverflow.com/questions/24302152/opengl-alpha-test-how-to-replace-alphafunc-deprecated
+    if(gl_FragColor.a <= 0.0) {
+      discard;
+    }
   }
 `;
 
