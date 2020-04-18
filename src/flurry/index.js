@@ -7,7 +7,7 @@ import type {FlurryInfo, GlobalInfo} from './types';
 
 import ColorModes from './color-modes';
 import {currentTime, timeInSecondsSinceStart} from './flurry-c';
-import {DRAW_SPARKS} from './flurry-h';
+import {DEF_PRESET, DRAW_SPARKS} from './flurry-h';
 import {newFlurryInfo} from './flurry-info';
 import {PresetNum} from './preset-num';
 import {drawSmoke_Scalar, updateSmoke_ScalarBase} from './smoke';
@@ -16,8 +16,6 @@ import {drawSpark, updateSpark} from './spark';
 import {updateStar} from './star';
 import {makeTexture} from './texture';
 import {init} from '../webgl/init';
-
-export const DEF_PRESET = 'random';
 
 export function GLSetupRC(global: GlobalInfo): void {
   init(global, DRAW_SPARKS);

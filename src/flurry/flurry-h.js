@@ -18,4 +18,9 @@ export const MAGIC = {
 
 export const MAX_SPARKS = 64;
 
+export const BIGMYSTERY = 1800.0;
+export const MAXANGLES = 16384;
+
 export const DRAW_SPARKS = false;
+
+export const DEF_PRESET = 'random';

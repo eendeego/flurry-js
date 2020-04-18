@@ -5,7 +5,7 @@
 import type {FlurryInfo, GlobalInfo, Spark} from './types';
 
 import ColorModes from './color-modes';
-import {MAGIC} from './flurry-h';
+import {BIGMYSTERY, MAGIC, MAXANGLES} from './flurry-h';
 import {mat4} from 'gl-matrix';
 import nullthrows from 'nullthrows';
 import {randBell, randFlt} from './random';
@@ -191,9 +191,6 @@ export function drawSpark(
   }
   // gl.popMatrix();
 }
-
-const BIGMYSTERY = 1800.0;
-const MAXANGLES = 16384;
 
 export function updateSparkColour(
   global: GlobalInfo,
