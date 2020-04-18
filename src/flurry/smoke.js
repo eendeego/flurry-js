@@ -4,7 +4,7 @@
 
 import type {ProgramInfo, FlurryInfo, GlobalInfo, SmokeV} from './types';
 
-import {MAGIC, NUMSMOKEPARTICLES, fastDistance2D} from './flurry-h';
+import {MAGIC, NUMSMOKEPARTICLES} from './flurry-h';
 import {randBell, randFlt} from './random';
 
 import {mat4} from 'gl-matrix';
@@ -16,6 +16,19 @@ import nullthrows from 'nullthrows';
 // #define NOT_QUITE_DEAD 3
 
 // #define intensity 75000.0f;
+
+function fastDistance2D(x: number, y: number): number {
+  /* this function computes the distance from 0,0 to x,y with ~3.5% error */
+  /* first compute the absolute value of x,y */
+  const xx = x < 0.0 ? -x : x;
+  const yy = y < 0.0 ? -y : y;
+
+  /* compute the minimum of x,y */
+  const mn = xx < yy ? xx : yy;
+
+  /* return the distance */
+  return xx + yy - mn * 0.5 - mn * 0.25 + mn * 0.0625;
+}
 
 export function initSmoke(gl: WebGLRenderingContext): SmokeV {
   const programInfo = initShaders(gl);

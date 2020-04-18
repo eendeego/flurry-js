@@ -1,18 +1,5 @@
 // @flow strict
 
-export function fastDistance2D(x: number, y: number): number {
-  /* this function computes the distance from 0,0 to x,y with ~3.5% error */
-  /* first compute the absolute value of x,y */
-  const xx = x < 0.0 ? -x : x;
-  const yy = y < 0.0 ? -y : y;
-
-  /* compute the minimum of x,y */
-  const mn = xx < yy ? xx : yy;
-
-  /* return the distance */
-  return xx + yy - mn * 0.5 - mn * 0.25 + mn * 0.0625;
-}
-
 export const NUMSMOKEPARTICLES = 3600;
 
 export const MAGIC = {
