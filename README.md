@@ -1,6 +1,6 @@
 # flurry-js
 
-![Flurry Video on Youtube](https://img.youtube.com/vi/5KWIuXyeu4k/0.jpg)](https://www.youtube.com/watch?v=5KWIuXyeu4k)
+[![Flurry Video on Youtube](https://img.youtube.com/vi/5KWIuXyeu4k/0.jpg)](https://www.youtube.com/watch?v=5KWIuXyeu4k)
 
 ## WebGL port of the Flurry screensaver
 
