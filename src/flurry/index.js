@@ -52,7 +52,7 @@ function drawFlurry(global: GlobalInfo, flurry: FlurryInfo, b: number): void {
   }
   updateSmoke(global, flurry, flurry.s);
 
-  drawSmoke_Scalar(global, flurry, flurry.s, b);
+  drawSmoke(global, flurry, flurry.s, b);
 }
 
 export function GLResize(global: GlobalInfo, w: number, h: number): void {
