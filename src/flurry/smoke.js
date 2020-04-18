@@ -11,11 +11,7 @@ import {mat4} from 'gl-matrix';
 import {initSeraphimBuffers} from '../webgl/seraphim-buffers';
 import {initShaders} from '../webgl/seraphim-shaders';
 import nullthrows from 'nullthrows';
-
-// #define MAXANGLES 16384
-// #define NOT_QUITE_DEAD 3
-
-// #define intensity 75000.0f;
+import Deadness from './deadness';
 
 function fastDistance2D(x: number, y: number): number {
   /* this function computes the distance from 0,0 to x,y with ~3.5% error */
@@ -50,7 +46,7 @@ export function initSmoke(gl: WebGLRenderingContext): SmokeV {
       position: new Float32Array(3 * 4),
       oldposition: new Float32Array(3 * 4),
       delta: new Float32Array(3 * 4),
-      dead: new Uint32Array(4),
+      dead: new Uint32Array(4).fill(Deadness.alive),
       time: new Float32Array(4),
       animFrame: new Uint32Array(4),
     })),
@@ -134,7 +130,7 @@ export function updateSmoke_ScalarBase(
           0.85 * (1.0 + randBell(0.5 * MAGIC.colorIncoherence));
 
         s.p[s.nextParticle].time[s.nextSubParticle] = flurry.fTime;
-        s.p[s.nextParticle].dead[s.nextSubParticle] = 0;
+        s.p[s.nextParticle].dead[s.nextSubParticle] = Deadness.alive;
         s.p[s.nextParticle].animFrame[s.nextSubParticle] = Math.floor(
           Math.random() * 64,
         );
@@ -164,7 +160,7 @@ export function updateSmoke_ScalarBase(
 
   for (let i = 0; i < NUMSMOKEPARTICLES / 4; i++) {
     for (let k = 0; k < 4; k++) {
-      if (s.p[i].dead[k]) {
+      if (s.p[i].dead[k] !== Deadness.alive) {
         continue;
       }
 
@@ -196,7 +192,7 @@ export function updateSmoke_ScalarBase(
       deltaz *= flurry.drag;
 
       if (deltax * deltax + deltay * deltay + deltaz * deltaz >= 25000000.0) {
-        s.p[i].dead[k] = 1;
+        s.p[i].dead[k] = Deadness.dead;
         continue;
       }
 
@@ -231,7 +227,7 @@ export function drawSmoke_Scalar(
 
   for (let i = 0; i < NUMSMOKEPARTICLES / 4; i++) {
     for (let k = 0; k < 4; k++) {
-      if (s.p[i].dead[k]) {
+      if (s.p[i].dead[k] !== Deadness.alive) {
         continue;
       }
 
@@ -240,7 +236,7 @@ export function drawSmoke_Scalar(
           (flurry.fTime - s.p[i].time[k]) * flurry.streamExpansion) *
         screenRatio;
       if (thisWidth >= width) {
-        s.p[i].dead[k] = 1;
+        s.p[i].dead[k] = Deadness.dead;
         continue;
       }
       const z = s.p[i].position[2 * 3 + k];
@@ -308,9 +304,9 @@ export function drawSmoke_Scalar(
           const v1 = v0 + 0.125;
 
           let cm = 1.375 - thisWidth / width;
-          if (s.p[i].dead[k] === 3) {
+          if (s.p[i].dead[k] === Deadness.undead) {
             cm *= 0.125;
-            s.p[i].dead[k] = 1;
+            s.p[i].dead[k] = Deadness.dead;
           }
 
           cm *= brightness;
