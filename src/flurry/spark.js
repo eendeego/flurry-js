@@ -5,9 +5,10 @@
 import type {FlurryInfo, GlobalInfo, Spark} from './types';
 
 import ColorModes from './color-modes';
-import {MAGIC, randBell, randFlt} from './flurry-h';
+import {MAGIC} from './flurry-h';
 import {mat4} from 'gl-matrix';
 import nullthrows from 'nullthrows';
+import {randBell, randFlt} from './random';
 // import {initBuffer} from "../webgl/buffers";
 // import {initShaderProgram} from "../webgl/shaders";
 

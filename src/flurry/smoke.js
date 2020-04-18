@@ -4,13 +4,8 @@
 
 import type {ProgramInfo, FlurryInfo, GlobalInfo, SmokeV} from './types';
 
-import {
-  MAGIC,
-  NUMSMOKEPARTICLES,
-  fastDistance2D,
-  randBell,
-  randFlt,
-} from './flurry-h';
+import {MAGIC, NUMSMOKEPARTICLES, fastDistance2D} from './flurry-h';
+import {randBell, randFlt} from './random';
 
 import {mat4} from 'gl-matrix';
 import {initSeraphimBuffers} from '../webgl/seraphim-buffers';

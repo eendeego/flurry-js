@@ -3,7 +3,8 @@
 // @flow
 
 import type {FlurryInfo, GlobalInfo, Star} from './types';
-import {randFlt, MAGIC} from './flurry-h';
+import {MAGIC} from './flurry-h';
+import {randFlt} from './random';
 
 export function initStar(rotSpeed?: number): Star {
   return {

@@ -4,7 +4,7 @@
 
 import type {ColorModesType} from './color-modes';
 import type {FlurryInfo, GlobalInfo} from './types';
-import {randFlt} from './flurry-h';
+import {randFlt} from './random';
 
 import {timeInSecondsSinceStart} from './flurry-c';
 import {initSmoke} from './smoke';
