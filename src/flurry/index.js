@@ -14,14 +14,9 @@ import {drawSpark, updateSpark} from './spark';
 // import {drawSpark, updateSpark, initSparkBuffers} from "./spark";
 import {updateStar} from './star';
 import {makeTexture} from './texture';
-import {init} from '../webgl/init';
 
 export function currentTime(): number {
   return Date.now() * 0.001;
-}
-
-export function GLSetupRC(global: GlobalInfo): void {
-  init(global, DRAW_SPARKS);
 }
 
 // const updateSmoke = (function () {
@@ -141,6 +136,7 @@ export function reshapeFlurry(global: GlobalInfo) {
 // TODO add physical config argument
 export function initFlurry(global: GlobalInfo, presetStr: ?string) {
   global.startTime = currentTime();
+  global.oldFrameTime = -1;
 
   global.flurry = null;
 
@@ -277,12 +273,10 @@ export function initFlurry(global: GlobalInfo, presetStr: ?string) {
 
   //   if (init_GL(mi)) {
   reshapeFlurry(global);
-  GLSetupRC(global);
   //   } else {
   //     // // TODO
   //     // MI_CLEARWINDOW(mi);
   //   }
-  global.oldFrameTime = -1;
 }
 
 export function renderScene(global: GlobalInfo): void {

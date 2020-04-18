@@ -3,25 +3,18 @@
 // @flow
 
 import type {GlobalInfo} from './types';
-import type {FlurryRenderingContext} from './rendering-context';
 
 import OptimizationModes from './optimization-modes';
 
-export function newGlobal(
-  renderingContext: FlurryRenderingContext,
-): GlobalInfo {
+export function createGlobal(gl: WebGLRenderingContext): GlobalInfo {
   return {
-    /* system values */
-    // glx_context: GLXContext,
-    // window: Window,
-    gl: renderingContext.gl,
-    // canvas: HTMLCanvasElement,
+    gl,
 
     // Only one supported in JS
     optMode: OptimizationModes.OPT_MODE_SCALAR_BASE,
 
-    sys_glWidth: renderingContext.width,
-    sys_glHeight: renderingContext.height,
+    sys_glWidth: gl.canvas.width,
+    sys_glHeight: gl.canvas.height,
 
     startTime: -1,
     timeInSecondsSinceStart: -1,

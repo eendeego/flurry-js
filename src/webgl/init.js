@@ -1,9 +1,19 @@
 // @flow strict
 
-import type {GlobalInfo} from '../flurry/types';
+const nullthrows = require('nullthrows');
 
-export function init(global: GlobalInfo, drawSparks: boolean): void {
-  const gl = global.gl;
+function initExtension(gl: WebGLRenderingContext, extension: string): void {
+  const oesElementIndexUint = gl.getExtension(extension);
+  if (oesElementIndexUint == null) {
+    console.log(extension + ' not available');
+  }
+}
+
+export function initWebGL(canvas: HTMLCanvasElement): WebGLRenderingContext {
+  const gl = nullthrows(canvas.getContext('webgl'));
+
+  initExtension(gl, 'OES_element_index_uint');
+  initExtension(gl, 'OES_texture_float');
 
   /* setup the defaults for OpenGL */
   gl.disable(gl.DEPTH_TEST);
@@ -14,10 +24,13 @@ export function init(global: GlobalInfo, drawSparks: boolean): void {
 
   gl.disable(gl.CULL_FACE);
   gl.enable(gl.BLEND);
-  gl.viewport(0, 0, global.sys_glWidth, global.sys_glHeight);
+  gl.viewport(0, 0, canvas.width, canvas.height);
   gl.clear(gl.COLOR_BUFFER_BIT);
 
-  if (drawSparks) {
-    // initSparkBuffers(global);
-  }
+  // // Saving for future reference, not needed now
+  // if (drawSparks) {
+  //   // initSparkBuffers(global);
+  // }
+
+  return gl;
 }

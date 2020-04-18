@@ -1,25 +1,29 @@
 import React, {useEffect, useRef} from 'react';
 import './App.css';
 import {initFlurry, renderScene} from './flurry';
-import {newGlobal} from './flurry/global';
+import {createGlobal} from './flurry/global';
 // import {DEF_PRESET} from "./flurry";
-import {newRenderingContext} from './flurry/rendering-context';
+import {initWebGL} from './webgl/init';
 // import {PresetNum} from "./flurry/preset-num";
 // import {tutorialMain} from "./webgl-tutorial";
 
 function App() {
-  const width = 640;
-  const height = 480;
   const canvasRef = useRef();
+  const canvas = canvasRef.current;
+
   useEffect(() => {
+    // Initialization
     const canvas = canvasRef.current;
-    const renderingContext = newRenderingContext(canvas);
-    const global = newGlobal(renderingContext);
+    const gl = initWebGL(canvas);
+
+    const global = createGlobal(gl);
 
     // initFlurry(global, DEF_PRESET);
     initFlurry(global, 'psychedelic');
     // initFlurry(global, "water");
     // initFlurry(global, "fire");
+
+    // Animation
     let handle;
     const update = () => {
       try {
@@ -39,27 +43,15 @@ function App() {
     return () => cancelAnimationFrame(handle);
   }, []);
 
-  // const tutorialCanvasRef = useRef();
-  // useEffect(() => {
-  //   tutorialMain(tutorialCanvasRef.current);
-  // }, []);
-
   return (
-    <>
-      <div className="App">
-        <canvas
-          style={{backgroundColor: 'black'}}
-          ref={canvasRef}
-          width={width}
-          height={height}
-        />
-      </div>
-      {/*
-      <div className="App">
-        <canvas ref={tutorialCanvasRef} width="640" height="480" />
-      </div>
-      */}
-    </>
+    <div className="App">
+      <canvas
+        style={{backgroundColor: 'black'}}
+        ref={canvasRef}
+        width={640}
+        height={480}
+      />
+    </div>
   );
 }
 
