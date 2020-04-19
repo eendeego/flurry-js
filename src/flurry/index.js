@@ -2,13 +2,13 @@
 
 // @flow
 
-import type {PresetNumType} from './preset-num';
+import type {PresetsType} from './presets';
 import type {FlurryInfo, GlobalInfo} from './types';
 
 import ColorModes from './color-modes';
-import {DEF_PRESET, DRAW_SPARKS} from './constants';
+import {DRAW_SPARKS} from './constants';
 import {createFlurry} from './flurry-info';
-import {PresetNum} from './preset-num';
+import {Presets} from './presets';
 import {drawSmoke, updateSmoke} from './smoke';
 import {drawSpark, updateSpark} from './spark';
 // import {drawSpark, updateSpark, initSparkBuffers} from "./spark";
@@ -59,33 +59,6 @@ export function GLResize(global: GlobalInfo, w: number, h: number): void {
   global.height = h;
 }
 
-const presetStr2PresetNum = {
-  water: PresetNum.PRESET_WATER,
-  fire: PresetNum.PRESET_FIRE,
-  psychedelic: PresetNum.PRESET_PSYCHEDELIC,
-  rgb: PresetNum.PRESET_RGB,
-  binary: PresetNum.PRESET_BINARY,
-  classic: PresetNum.PRESET_CLASSIC,
-  insane: PresetNum.PRESET_INSANE,
-};
-function presetStr2Num(presetStr: ?string): PresetNumType {
-  if (presetStr == null || presetStr.length === 0) {
-    return presetStr2Num(DEF_PRESET);
-  }
-
-  if (presetStr === 'random') {
-    return ((Math.round(
-      Math.random() * PresetNum.PRESET_MAX,
-    ): any): PresetNumType);
-  }
-
-  if (presetStr2PresetNum[presetStr] != null) {
-    return presetStr2PresetNum[presetStr];
-  }
-
-  throw new Error(`unknown preset ${presetStr}`);
-}
-
 /* new window size or exposure */
 export function reshapeFlurry(global: GlobalInfo) {
   // const gl = global.gl;
@@ -103,7 +76,7 @@ export function reshapeFlurry(global: GlobalInfo) {
 
 function flurriesFromPreset(
   global: GlobalInfo,
-  preset: PresetNumType,
+  preset: PresetsType,
 ): Array<FlurryInfo> {
   /**
    * createFlurry arguments:
@@ -115,11 +88,11 @@ function flurriesFromPreset(
    *   bf: number,
    */
   switch (preset) {
-    case PresetNum.PRESET_WATER:
+    case Presets.WATER:
       return Array.from({length: 9}, () =>
         createFlurry(global, 1, ColorModes.blueColorMode, 100.0, 2.0, 2.0),
       );
-    case PresetNum.PRESET_FIRE:
+    case Presets.FIRE:
       return [
         createFlurry(
           global,
@@ -130,26 +103,26 @@ function flurriesFromPreset(
           1.0,
         ),
       ];
-    case PresetNum.PRESET_PSYCHEDELIC:
+    case Presets.PSYCHEDELIC:
       return [
         createFlurry(global, 10, ColorModes.rainbowColorMode, 200.0, 2.0, 1.0),
       ];
-    case PresetNum.PRESET_RGB:
+    case Presets.RGB:
       return [
         createFlurry(global, 3, ColorModes.blueColorMode, 100.0, 0.8, 1.0),
         createFlurry(global, 3, ColorModes.greenColorMode, 100.0, 0.8, 1.0),
         createFlurry(global, 3, ColorModes.redColorMode, 100.0, 0.8, 1.0),
       ];
-    case PresetNum.PRESET_BINARY:
+    case Presets.BINARY:
       return [
         createFlurry(global, 16, ColorModes.tiedyeColorMode, 1000.0, 1.5, 1.0),
         createFlurry(global, 16, ColorModes.tiedyeColorMode, 1000.0, 0.5, 1.0),
       ];
-    case PresetNum.PRESET_CLASSIC:
+    case Presets.CLASSIC:
       return [
         createFlurry(global, 5, ColorModes.tiedyeColorMode, 10000.0, 1.0, 1.0),
       ];
-    case PresetNum.PRESET_INSANE:
+    case Presets.INSANE:
       return [
         createFlurry(global, 64, ColorModes.tiedyeColorMode, 1000.0, 0.5, 0.5),
       ];
@@ -162,20 +135,18 @@ function flurriesFromPreset(
 }
 
 // TODO add physical config argument
-export function initFlurry(global: GlobalInfo, presetStr: ?string) {
+export function initFlurry(global: GlobalInfo, preset: PresetsType) {
   global.startTime = currentTime();
   global.oldFrameTime = -1;
 
-  const presetNum = presetStr2Num(presetStr);
+  // For a later day
+  // if (preset === Presets.RANDOM) {
+  //   return ((Math.round(Math.random() * Presets.MAX): any): PresetsType);
+  // }
 
-  global.flurries = flurriesFromPreset(global, presetNum);
+  global.flurries = flurriesFromPreset(global, preset);
 
-  //   if (init_GL(mi)) {
   reshapeFlurry(global);
-  //   } else {
-  //     // // TODO
-  //     // MI_CLEARWINDOW(mi);
-  //   }
 }
 
 export function renderScene(global: GlobalInfo): void {

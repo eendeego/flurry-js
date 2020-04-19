@@ -10,15 +10,16 @@
 }
 
 .Controls {
+  color: #dddddd;
   display: flex;
+  font-size: 12px;
   flex-direction: row;
   justify-content: flex-end;
   margin: 12px;
 }
 
-.Controls {
-  display: flex;
-  flex-direction: row;
+.Controls-size {
+  margin-left: 8px;
 }
 
 .Flurry {

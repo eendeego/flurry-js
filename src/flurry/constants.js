@@ -1,5 +1,7 @@
 // @flow strict
 
+import {Presets} from './presets';
+
 export const NUMSMOKEPARTICLES = 3600;
 
 export const MAGIC = {
@@ -23,4 +25,4 @@ export const MAXANGLES = 16384;
 
 export const DRAW_SPARKS = false;
 
-export const DEF_PRESET = 'random';
+export const DEF_PRESET = Presets.PSYCHEDELIC;

@@ -1,11 +1,10 @@
 import React, {useEffect, useRef, useState} from 'react';
 import './App.css';
 import {initFlurry, renderScene} from './flurry';
+import {DEF_PRESET} from './flurry/constants';
 import {createGlobal, resizeGlobal} from './flurry/global';
-// import {DEF_PRESET} from "./flurry";
 import {initWebGL, resize} from './webgl/global';
-// import {PresetNum} from "./flurry/preset-num";
-// import {tutorialMain} from "./webgl-tutorial";
+import {Presets} from './flurry/presets';
 
 function App() {
   const canvasRef = useRef();
@@ -13,6 +12,7 @@ function App() {
 
   const globalRef = useRef();
 
+  const [preset, setPreset] = useState(DEF_PRESET);
   const [size, setSize] = useState('medium');
 
   useEffect(() => {
@@ -23,10 +23,7 @@ function App() {
     const global = createGlobal(gl);
     globalRef.current = global;
 
-    // initFlurry(global, DEF_PRESET);
-    initFlurry(global, 'psychedelic');
-    // initFlurry(global, "water");
-    // initFlurry(global, "fire");
+    initFlurry(global, DEF_PRESET);
 
     // Animation
     let handle;
@@ -53,9 +50,28 @@ function App() {
     resize(globalRef.current.gl);
   }, [size]);
 
+  useEffect(() => {
+    initFlurry(globalRef.current, preset);
+  }, [preset]);
+
   return (
     <div className="App">
       <div className="Controls">
+        <label>
+          Preset{' '}
+          <select
+            value={preset}
+            onChange={(e) => setPreset(parseInt(e.target.value, 10))}
+          >
+            <option value={Presets.WATER}>Water</option>
+            <option value={Presets.FIRE}>Fire</option>
+            <option value={Presets.PSYCHEDELIC}>Psychedelic</option>
+            <option value={Presets.RGB}>RGB</option>
+            <option value={Presets.BINARY}>Binary</option>
+            <option value={Presets.CLASSIC}>Classic</option>
+            <option value={Presets.INSANE}>Insane</option>
+          </select>
+        </label>
         <button
           className="Controls-size"
           onClick={() => {
