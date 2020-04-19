@@ -26,6 +26,7 @@ export function initTexture(
   const border = 0;
   const srcFormat = gl.LUMINANCE_ALPHA;
   const srcType = gl.UNSIGNED_BYTE;
+  const pixels = new Uint8Array(data.buffer);
   gl.texImage2D(
     gl.TEXTURE_2D,
     level,
@@ -35,7 +36,7 @@ export function initTexture(
     border,
     srcFormat,
     srcType,
-    data,
+    pixels,
   );
   gl.generateMipmap(gl.TEXTURE_2D);
 
