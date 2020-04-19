@@ -54,26 +54,6 @@ function drawFlurry(global: GlobalInfo, flurry: FlurryInfo, b: number): void {
   drawSmoke(global, flurry, flurry.s, b);
 }
 
-export function GLResize(global: GlobalInfo, w: number, h: number): void {
-  global.width = w;
-  global.height = h;
-}
-
-/* new window size or exposure */
-export function reshapeFlurry(global: GlobalInfo) {
-  // const gl = global.gl;
-  // // TODO
-  // // gl.makeCurrent(MI_DISPLAY(mi), global.window, global.glx_context);
-  // gl.viewport(0.0, 0.0, global.sys_glWidth, global.sys_glHeight);
-  // // gl.matrixMode(gl.PROJECTION);
-  // // gl.loadIdentity();
-  // // gl.ortho(0, global.sys_glWidth, 0, global.sys_glHeight, -1, 1);
-  // // gl.matrixMode(gl.MODELVIEW);
-  // gl.clear(gl.COLOR_BUFFER_BIT);
-  // gl.flush();
-  GLResize(global, global.gl.canvas.clientWidth, global.gl.canvas.clientHeight);
-}
-
 function flurriesFromPreset(
   global: GlobalInfo,
   preset: PresetsType,
@@ -135,7 +115,7 @@ function flurriesFromPreset(
 }
 
 // TODO add physical config argument
-export function initFlurry(global: GlobalInfo, preset: PresetsType) {
+export function initFlurries(global: GlobalInfo, preset: PresetsType) {
   global.startTime = currentTime();
   global.oldFrameTime = -1;
 
@@ -145,8 +125,6 @@ export function initFlurry(global: GlobalInfo, preset: PresetsType) {
   // }
 
   global.flurries = flurriesFromPreset(global, preset);
-
-  reshapeFlurry(global);
 }
 
 export function renderScene(global: GlobalInfo): void {

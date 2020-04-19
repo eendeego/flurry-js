@@ -25,4 +25,4 @@ export const MAXANGLES = 16384;
 
 export const DRAW_SPARKS = false;
 
-export const DEF_PRESET = Presets.PSYCHEDELIC;
+export const DEF_PRESET = Presets.CLASSIC;

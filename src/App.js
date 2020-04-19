@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import './App.css';
-import {initFlurry, renderScene} from './flurry';
+import {initFlurries, renderScene} from './flurry';
 import {DEF_PRESET} from './flurry/constants';
 import {createGlobal, resizeGlobal} from './flurry/global';
 import {initWebGL, resize} from './webgl/global';
@@ -23,7 +23,7 @@ function App() {
     const global = createGlobal(gl);
     globalRef.current = global;
 
-    initFlurry(global, DEF_PRESET);
+    initFlurries(global, DEF_PRESET);
 
     // Animation
     let handle;
@@ -51,7 +51,7 @@ function App() {
   }, [size]);
 
   useEffect(() => {
-    initFlurry(globalRef.current, preset);
+    initFlurries(globalRef.current, preset);
   }, [preset]);
 
   return (
