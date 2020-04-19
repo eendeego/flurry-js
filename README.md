@@ -1,6 +1,6 @@
 # flurry-js
 
-[![Flurry Video on Youtube](https://img.youtube.com/vi/5KWIuXyeu4k/0.jpg)](https://www.youtube.com/watch?v=5KWIuXyeu4k)
+[<img src="https://raw.github.com/luismreis/flurry-js/master/pictures/sample-01.jpg" alt="flurry.now.sh" width="640" hreight="480"/>](https://flurry.now.sh/)
 
 ## WebGL port of the Flurry screensaver
 

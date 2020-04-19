@@ -34,3 +34,8 @@ export function initWebGL(canvas: HTMLCanvasElement): WebGLRenderingContext {
 
   return gl;
 }
+
+export function resize(gl: WebGLRenderingContext): void {
+  gl.viewport(0.0, 0.0, gl.canvas.clientWidth, gl.canvas.clientHeight);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+}

@@ -19,3 +19,11 @@ export function createGlobal(gl: WebGLRenderingContext): GlobalInfo {
     texid: -1, // GLuint
   };
 }
+
+export function resizeGlobal(global: GlobalInfo): GlobalInfo {
+  return {
+    ...global,
+    width: global.gl.canvas.clientWidth,
+    height: global.gl.canvas.clientHeight,
+  };
+}
