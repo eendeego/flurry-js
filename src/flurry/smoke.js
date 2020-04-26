@@ -466,7 +466,7 @@ function drawSeraphim(
   flurry: FlurryInfo,
   quads: number,
 ): void {
-  const {gl, texid} = global;
+  const {gl, smokeTexture} = global;
   const {
     s: {
       seraphimVertices,
@@ -522,7 +522,7 @@ function drawSeraphim(
   gl.activeTexture(gl.TEXTURE0);
 
   // Bind the texture to texture unit 0
-  gl.bindTexture(gl.TEXTURE_2D, texid);
+  gl.bindTexture(gl.TEXTURE_2D, smokeTexture);
 
   // Tell the shader we bound the texture to texture unit 0
   gl.uniform1i(programInfo.uniformLocations.uSampler, 0);

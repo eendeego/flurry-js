@@ -13,7 +13,6 @@ import {drawSmoke, updateSmoke} from './smoke';
 import {drawSpark, updateSpark} from './spark';
 // import {drawSpark, updateSpark, initSparkBuffers} from "./spark";
 import {updateStar} from './star';
-import {makeTexture} from './texture';
 
 export function currentTime(): number {
   return Date.now() * 0.001;
@@ -42,7 +41,7 @@ function drawFlurry(global: GlobalInfo, flurry: FlurryInfo, b: number): void {
     flurry.spark[i].color[0] = 1.0;
     flurry.spark[i].color[1] = 1.0;
     flurry.spark[i].color[2] = 1.0;
-    updateSpark(global, flurry, flurry.spark[i]);
+    updateSpark(flurry, flurry.spark[i]);
 
     // #ifdef DRAW_SPARKS
     if (DRAW_SPARKS) {
@@ -114,7 +113,6 @@ function flurriesFromPreset(
   }
 }
 
-// TODO add physical config argument
 export function initFlurries(global: GlobalInfo, preset: PresetsType) {
   global.startTime = currentTime();
   global.oldFrameTime = -1;
@@ -153,11 +151,6 @@ export function renderScene(global: GlobalInfo): void {
     alpha = Math.min(5.0 * deltaFrameTime, 0.2);
   }
   global.oldFrameTime = newFrameTime;
-
-  if (global.frameCounter === 0) {
-    // TODO Move this to init
-    global.texid = makeTexture(gl);
-  }
 
   gl.enable(gl.BLEND);
   // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);

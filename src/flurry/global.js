@@ -3,8 +3,19 @@
 // @flow
 
 import type {GlobalInfo} from './types';
+import {bootstrapWebGL, configureWebGL} from '../webgl/global';
+import {makeTexture} from './texture';
 
-export function createGlobal(gl: WebGLRenderingContext): GlobalInfo {
+export function boostrapGlobal(canvas: HTMLCanvasElement): GlobalInfo {
+  const gl = bootstrapWebGL(canvas);
+
+  configureWebGL(gl);
+
+  // // Saving for future reference, not needed now
+  // if (drawSparks) {
+  //   // initSparkBuffers(global);
+  // }
+
   return {
     gl,
     width: gl.canvas.clientWidth,
@@ -16,7 +27,7 @@ export function createGlobal(gl: WebGLRenderingContext): GlobalInfo {
     oldFrameTime: -1,
 
     flurries: [],
-    texid: -1, // GLuint
+    smokeTexture: makeTexture(gl),
   };
 }
 

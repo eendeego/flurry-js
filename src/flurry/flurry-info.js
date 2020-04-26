@@ -56,14 +56,14 @@ export function createFlurry(
     numStreams: streams,
     flurryRandomSeed,
     fTime,
-    fOldTime: 0,
+    fOldTime,
     fDeltaTime: fTime - fOldTime,
     briteFactor: bf,
     drag: 0,
     dframe,
   };
 
-  flurry.spark.forEach((spark) => updateSpark(global, flurry, spark));
+  flurry.spark.forEach((spark) => updateSpark(flurry, spark));
 
   return flurry;
 }

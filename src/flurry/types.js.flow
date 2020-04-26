@@ -87,7 +87,7 @@ export type GlobalInfo = {|
   oldFrameTime: number,
 
   flurries: $ReadOnlyArray<FlurryInfo>,
-  texid: WebGLTexture, // GLuint
+  smokeTexture: WebGLTexture,
 
   // Only used if DRAW_SPARKS is true
   debug?: {

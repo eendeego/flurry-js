@@ -264,7 +264,7 @@ export function updateSparkColour(
     0.0625 * (0.5 + Math.cos(37.0 * (thisPointInRadians + thisAngle)));
 }
 
-export function updateSpark(global: GlobalInfo, flurry: FlurryInfo, s: Spark) {
+export function updateSpark(flurry: FlurryInfo, s: Spark) {
   const rotationsPerSecond = (2.0 * Math.PI * MAGIC.fieldSpeed) / MAXANGLES;
   const thisAngle = flurry.fTime * rotationsPerSecond;
   let cycleTime = 20.0;

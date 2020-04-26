@@ -11,15 +11,12 @@
 
 import {initTexture} from '../webgl/seraphim-textures';
 
-const smallTextureArray = new Uint8ClampedArray(32 * 32 * 2);
-const bigTextureArray = new Uint8ClampedArray(256 * 256 * 2);
-
 function fNum(num: number): string {
   const s = num.toString(16);
   return num < 16 ? ' ' + s : s;
 }
 
-function dumpSmallTexture() {
+export function dumpSmallTexture(smallTextureArray: Uint8ClampedArray): void {
   let s = [];
   for (let i = 0; i < 32; i++) {
     for (let j = 0; j < 32; j++) {
@@ -30,7 +27,7 @@ function dumpSmallTexture() {
   console.log(' ' + s.join(' '));
 }
 
-function dumpBigTexture() {
+export function dumpBigTexture(bigTextureArray: Uint8ClampedArray): void {
   let s = [];
   for (let i = 0; i < 8; i++) {
     for (let j = 0; j < 8; j++) {
@@ -49,20 +46,7 @@ function dumpBigTexture() {
 }
 
 /* simple smoothing routine */
-function smoothTexture() {
-  // for (let i = 1; i < 31; i++) {
-  //   for (let j = 1; j < 31; j++) {
-  //     let t = smallTextureArray[32 * i + j] * 4;
-  //     t += smallTextureArray[32 * (i - 1) + j];
-  //     t += smallTextureArray[32 * (i + 1) + j];
-  //     t += smallTextureArray[32 * i + j - 1];
-  //     t += smallTextureArray[32 * i + j + 1];
-  //     t /= 8.0;
-  //     smallTextureArray[32 * 32 + 32 * i + j] = t;
-  //   }
-  // }
-  // smallTextureArray.copyWithin(0, 32 * 32);
-
+function smoothTexture(smallTextureArray: Uint8ClampedArray) {
   const filter = new Uint8ClampedArray(32 * 32);
   for (let i = 1; i < 31; i++) {
     for (let j = 1; j < 31; j++) {
@@ -84,7 +68,7 @@ function smoothTexture() {
 }
 
 /* add some randomness to texture data */
-function speckleTexture() {
+function speckleTexture(smallTextureArray: Uint8ClampedArray) {
   let speck;
   let t;
   for (let i = 2; i < 30; i++) {
@@ -105,11 +89,12 @@ function speckleTexture() {
   }
 }
 
-let makeSmallTextureFirstTime = true;
-function makeSmallTexture() {
+function makeSmallTexture(
+  smallTextureArray: Uint8ClampedArray,
+  firstRun: boolean,
+) {
   let r, t;
-  if (makeSmallTextureFirstTime) {
-    makeSmallTextureFirstTime = false;
+  if (firstRun) {
     for (let i = 0; i < 32; i++) {
       for (let j = 0; j < 32; j++) {
         r = Math.hypot(i - 15.5, j - 15.5);
@@ -138,12 +123,17 @@ function makeSmallTexture() {
       }
     }
   }
-  speckleTexture();
-  smoothTexture();
-  smoothTexture();
+  speckleTexture(smallTextureArray);
+  smoothTexture(smallTextureArray);
+  smoothTexture(smallTextureArray);
 }
 
-function copySmallTextureToBigTexture(k: number, l: number): void {
+function copySmallTextureToBigTexture(
+  bigTextureArray: Uint8ClampedArray,
+  smallTextureArray: Uint8ClampedArray,
+  k: number,
+  l: number,
+): void {
   for (let i = 0; i < 32; i++) {
     for (let j = 0; j < 32; j++) {
       bigTextureArray[32 * 8 * 2 * (i + k) + 2 * (j + l) + 0] =
@@ -154,7 +144,10 @@ function copySmallTextureToBigTexture(k: number, l: number): void {
   }
 }
 
-function averageLastAndFirstTextures() {
+function averageLastAndFirstTextures(
+  bigTextureArray: Uint8ClampedArray,
+  smallTextureArray: Uint8ClampedArray,
+) {
   for (let i = 0; i < 32; i++) {
     for (let j = 0; j < 32; j++) {
       const t =
@@ -166,49 +159,25 @@ function averageLastAndFirstTextures() {
   }
 }
 
-//: GLuint
 export function makeTexture(gl: WebGLRenderingContext): WebGLTexture {
+  const smallTextureArray = new Uint8ClampedArray(32 * 32);
+  const bigTextureArray = new Uint8ClampedArray(256 * 256 * 2);
+
   for (let i = 0; i < 8; i++) {
     for (let j = 0; j < 8; j++) {
       if (i === 7 && j === 7) {
-        averageLastAndFirstTextures();
+        averageLastAndFirstTextures(bigTextureArray, smallTextureArray);
       } else {
-        makeSmallTexture();
+        makeSmallTexture(smallTextureArray, i === 0 && j === 0);
       }
-      copySmallTextureToBigTexture(i * 32, j * 32);
+      copySmallTextureToBigTexture(
+        bigTextureArray,
+        smallTextureArray,
+        i * 32,
+        j * 32,
+      );
     }
   }
-
-  // dumpBigTexture();
-
-  // // TODO
-  // gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-
-  // gl.genTextures(1, theTexture);
-  // gl.bindTexture(gl.TEXTURE_2D, theTexture);
-
-  // /* Set the tiling mode (this is generally always GL_REPEAT). */
-  // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-  // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-
-  // /* Set the filtering. */
-  // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  // gl.texParameteri(
-  //   gl.TEXTURE_2D,
-  //   gl.TEXTURE_MIN_FILTER,
-  //   gl.LINEAR_MIPMAP_NEAREST,
-  // );
-
-  // glu.Build2DMipmaps(
-  //   gl.TEXTURE_2D,
-  //   2,
-  //   256,
-  //   256,
-  //   gl.LUMINANCE_ALPHA,
-  //   gl.UNSIGNED_BYTE,
-  //   bigTextureArray,
-  // );
-  // gl.texEnvf(gl.TEXTURE_ENV, gl.TEXTURE_ENV_MODE, gl.MODULATE);
 
   return initTexture(gl, bigTextureArray);
 }

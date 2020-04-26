@@ -2,6 +2,9 @@
 
 const nullthrows = require('nullthrows');
 
+/**
+ * Initialize WebGL extension
+ */
 function initExtension(gl: WebGLRenderingContext, extension: string): void {
   const oesElementIndexUint = gl.getExtension(extension);
   if (oesElementIndexUint == null) {
@@ -9,28 +12,34 @@ function initExtension(gl: WebGLRenderingContext, extension: string): void {
   }
 }
 
-export function initWebGL(canvas: HTMLCanvasElement): WebGLRenderingContext {
+/**
+ * Bootstrap WebGL and extensions
+ */
+export function bootstrapWebGL(
+  canvas: HTMLCanvasElement,
+): WebGLRenderingContext {
   const gl = nullthrows(canvas.getContext('webgl'));
 
   initExtension(gl, 'OES_element_index_uint');
   initExtension(gl, 'OES_texture_float');
 
-  /* setup the defaults for OpenGL */
-  gl.disable(gl.DEPTH_TEST);
+  return gl;
+}
 
+/**
+ * Configure WebGL for the visualization
+ */
+export function configureWebGL(
+  gl: WebGLRenderingContext,
+): WebGLRenderingContext {
   // Apparently unneeded in webgl
   // gl.shadeModel(gl.FLAT);
   // gl.disable(gl.LIGHTING);
 
   gl.disable(gl.CULL_FACE);
   gl.enable(gl.BLEND);
-  gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
+  gl.viewport(0, 0, gl.canvas.clientWidth, gl.canvas.clientHeight);
   gl.clear(gl.COLOR_BUFFER_BIT);
-
-  // // Saving for future reference, not needed now
-  // if (drawSparks) {
-  //   // initSparkBuffers(global);
-  // }
 
   return gl;
 }
