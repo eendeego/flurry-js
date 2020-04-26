@@ -3,7 +3,7 @@
 // @flow
 
 import type {ColorModesType} from './color-modes';
-import type {FlurryInfo, GlobalInfo} from './types';
+import type {FlurryInfo} from './types';
 import {randFlt} from './random';
 
 import {initSmoke} from './smoke';
@@ -22,7 +22,7 @@ export function deleteFlurryInfo(flurry: FlurryInfo): void {
 }
 
 export function createFlurry(
-  global: GlobalInfo,
+  seed: number,
   streams: number,
   colour: ColorModesType,
   thickness: number,
@@ -32,9 +32,9 @@ export function createFlurry(
   const flurryRandomSeed = randFlt(0.0, 300.0);
   const fOldTime = 0;
   const dframe = 0;
-  const fTime = global.timeInSecondsSinceStart + flurryRandomSeed;
+  const fTime = seed + flurryRandomSeed;
 
-  const smoke = initSmoke(global.gl);
+  const smoke = initSmoke();
   for (let i = 0; i < NUMSMOKEPARTICLES / 4; i++) {
     for (let k = 0; k < 4; k++) {
       smoke.p[i].dead[k] = 1;

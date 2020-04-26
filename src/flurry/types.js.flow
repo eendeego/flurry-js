@@ -34,15 +34,6 @@ export type SmokeV = {
   firstTime: number,
   frame: number,
   old: Array<number>, // [3];
-  seraphimVertices: Float32Array, // NUMSMOKEPARTICLES*2+1
-  seraphimVerticesBuffer: WebGLBuffer,
-  seraphimColors: Float32Array, // NUMSMOKEPARTICLES*4+1
-  seraphimColorsBuffer: WebGLBuffer,
-  seraphimTextures: Float32Array, // [NUMSMOKEPARTICLES*2*4];
-  seraphimTexturesBuffer: WebGLBuffer,
-  seraphimIndices: Uint16Array, // [NUMSMOKEPARTICLES*3*2];
-  seraphimIndicesBuffer: WebGLBuffer,
-  programInfo: ProgramInfo,
 };
 
 export type Star = {|
@@ -75,6 +66,17 @@ export type FlurryInfo = {|
   dframe: number,
 |};
 
+export type SeraphimBuffers = {|
+  seraphimVertices: Float32Array, // NUMSMOKEPARTICLES*2+1
+  seraphimVerticesBuffer: WebGLBuffer,
+  seraphimColors: Float32Array, // NUMSMOKEPARTICLES*4+1
+  seraphimColorsBuffer: WebGLBuffer,
+  seraphimTextures: Float32Array, // [NUMSMOKEPARTICLES*2*4];
+  seraphimTexturesBuffer: WebGLBuffer,
+  seraphimIndices: Uint16Array, // [NUMSMOKEPARTICLES*3*2];
+  seraphimIndicesBuffer: WebGLBuffer,
+|};
+
 export type GlobalInfo = {|
   /* system values */
   gl: WebGLRenderingContext,
@@ -87,6 +89,8 @@ export type GlobalInfo = {|
   oldFrameTime: number,
 
   flurries: $ReadOnlyArray<FlurryInfo>,
+  seraphimProgramInfo: ProgramInfo,
+  seraphimBuffers: SeraphimBuffers,
   smokeTexture: WebGLTexture,
 
   // Only used if DRAW_SPARKS is true

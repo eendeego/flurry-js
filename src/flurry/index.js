@@ -5,10 +5,8 @@
 import type {PresetsType} from './presets';
 import type {FlurryInfo, GlobalInfo} from './types';
 
-import ColorModes from './color-modes';
 import {DRAW_SPARKS} from './constants';
-import {createFlurry} from './flurry-info';
-import {Presets} from './presets';
+import {flurriesFromPreset} from './presets';
 import {drawSmoke, updateSmoke} from './smoke';
 import {drawSpark, updateSpark} from './spark';
 // import {drawSpark, updateSpark, initSparkBuffers} from "./spark";
@@ -53,76 +51,21 @@ function drawFlurry(global: GlobalInfo, flurry: FlurryInfo, b: number): void {
   drawSmoke(global, flurry, flurry.s, b);
 }
 
-function flurriesFromPreset(
+export function resetFlurries(
   global: GlobalInfo,
   preset: PresetsType,
-): Array<FlurryInfo> {
-  /**
-   * createFlurry arguments:
-   *   global: GlobalInfo,
-   *   streams: number,
-   *   colour: ColorModesType,
-   *   thickness: number,
-   *   speed: number,
-   *   bf: number,
-   */
-  switch (preset) {
-    case Presets.WATER:
-      return Array.from({length: 9}, () =>
-        createFlurry(global, 1, ColorModes.blueColorMode, 100.0, 2.0, 2.0),
-      );
-    case Presets.FIRE:
-      return [
-        createFlurry(
-          global,
-          12,
-          ColorModes.slowCyclicColorMode,
-          10000.0,
-          0.2,
-          1.0,
-        ),
-      ];
-    case Presets.PSYCHEDELIC:
-      return [
-        createFlurry(global, 10, ColorModes.rainbowColorMode, 200.0, 2.0, 1.0),
-      ];
-    case Presets.RGB:
-      return [
-        createFlurry(global, 3, ColorModes.blueColorMode, 100.0, 0.8, 1.0),
-        createFlurry(global, 3, ColorModes.greenColorMode, 100.0, 0.8, 1.0),
-        createFlurry(global, 3, ColorModes.redColorMode, 100.0, 0.8, 1.0),
-      ];
-    case Presets.BINARY:
-      return [
-        createFlurry(global, 16, ColorModes.tiedyeColorMode, 1000.0, 1.5, 1.0),
-        createFlurry(global, 16, ColorModes.tiedyeColorMode, 1000.0, 0.5, 1.0),
-      ];
-    case Presets.CLASSIC:
-      return [
-        createFlurry(global, 5, ColorModes.tiedyeColorMode, 10000.0, 1.0, 1.0),
-      ];
-    case Presets.INSANE:
-      return [
-        createFlurry(global, 64, ColorModes.tiedyeColorMode, 1000.0, 0.5, 0.5),
-      ];
-
-    default: {
-      console.log(`unknown preset ${preset}`);
-      throw new Error(`unknown preset ${preset}`);
-    }
-  }
-}
-
-export function initFlurries(global: GlobalInfo, preset: PresetsType) {
-  global.startTime = currentTime();
-  global.oldFrameTime = -1;
-
+): GlobalInfo {
   // For a later day
   // if (preset === Presets.RANDOM) {
   //   return ((Math.round(Math.random() * Presets.MAX): any): PresetsType);
   // }
 
-  global.flurries = flurriesFromPreset(global, preset);
+  return {
+    ...global,
+    startTime: currentTime(),
+    oldFrameTime: -1,
+    flurries: flurriesFromPreset(preset, global.timeInSecondsSinceStart),
+  };
 }
 
 export function renderScene(global: GlobalInfo): void {

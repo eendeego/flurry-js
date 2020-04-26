@@ -3,13 +3,25 @@
 // @flow
 
 import type {GlobalInfo} from './types';
-import {bootstrapWebGL, configureWebGL} from '../webgl/global';
-import {makeTexture} from './texture';
+import type {PresetsType} from './presets';
 
-export function boostrapGlobal(canvas: HTMLCanvasElement): GlobalInfo {
+import {NUMSMOKEPARTICLES} from './constants';
+import {flurriesFromPreset} from './presets';
+import {makeTexture} from './texture';
+import {bootstrapWebGL, configureWebGL} from '../webgl/global';
+import {initSeraphimBuffers} from '../webgl/seraphim-buffers';
+import {initShaders} from '../webgl/seraphim-shaders';
+
+export function boostrapGlobal(
+  canvas: HTMLCanvasElement,
+  preset: PresetsType,
+): GlobalInfo {
   const gl = bootstrapWebGL(canvas);
 
   configureWebGL(gl);
+
+  const seraphimProgramInfo = initShaders(gl);
+  const seraphimBuffers = initSeraphimBuffers(gl, NUMSMOKEPARTICLES);
 
   // // Saving for future reference, not needed now
   // if (drawSparks) {
@@ -21,12 +33,14 @@ export function boostrapGlobal(canvas: HTMLCanvasElement): GlobalInfo {
     width: gl.canvas.clientWidth,
     height: gl.canvas.clientHeight,
 
-    startTime: -1,
+    startTime: Date.now() * 0.001,
     timeInSecondsSinceStart: -1,
     frameCounter: 0,
     oldFrameTime: -1,
 
-    flurries: [],
+    flurries: flurriesFromPreset(preset, 0),
+    seraphimProgramInfo,
+    seraphimBuffers,
     smokeTexture: makeTexture(gl),
   };
 }

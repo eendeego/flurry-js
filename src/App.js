@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import './App.css';
-import {initFlurries, renderScene} from './flurry';
+import {resetFlurries, renderScene} from './flurry';
 import {DEF_PRESET} from './flurry/constants';
 import {boostrapGlobal, resizeGlobal} from './flurry/global';
 import {resize} from './webgl/global';
@@ -17,10 +17,8 @@ function App() {
 
   useEffect(() => {
     // Initialization
-    const global = boostrapGlobal(canvasRef.current);
+    const global = boostrapGlobal(canvasRef.current, DEF_PRESET);
     globalRef.current = global;
-
-    initFlurries(global, DEF_PRESET);
 
     // Animation
     let handle;
@@ -48,7 +46,7 @@ function App() {
   }, [size]);
 
   useEffect(() => {
-    initFlurries(globalRef.current, preset);
+    globalRef.current = resetFlurries(globalRef.current, preset);
   }, [preset]);
 
   return (

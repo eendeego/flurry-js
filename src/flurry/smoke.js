@@ -8,9 +8,6 @@ import {MAGIC, NUMSMOKEPARTICLES} from './constants';
 import {randBell, randFlt} from './random';
 
 import {mat4} from 'gl-matrix';
-import {initSeraphimBuffers} from '../webgl/seraphim-buffers';
-import {initShaders} from '../webgl/seraphim-shaders';
-import nullthrows from 'nullthrows';
 import Deadness from './deadness';
 
 function fastDistance2D(x: number, y: number): number {
@@ -26,20 +23,7 @@ function fastDistance2D(x: number, y: number): number {
   return xx + yy - mn * 0.5 - mn * 0.25 + mn * 0.0625;
 }
 
-export function initSmoke(gl: WebGLRenderingContext): SmokeV {
-  const programInfo = initShaders(gl);
-
-  const {
-    seraphimVertices,
-    seraphimVerticesBuffer,
-    seraphimColors,
-    seraphimColorsBuffer,
-    seraphimTextures,
-    seraphimTexturesBuffer,
-    seraphimIndices,
-    seraphimIndicesBuffer,
-  } = initSeraphimBuffers(gl, NUMSMOKEPARTICLES);
-
+export function initSmoke(): SmokeV {
   return {
     p: Array.from({length: NUMSMOKEPARTICLES / 4}, (_, i) => ({
       color: new Float32Array(4 * 4),
@@ -56,15 +40,6 @@ export function initSmoke(gl: WebGLRenderingContext): SmokeV {
     firstTime: 1,
     frame: 0,
     old: Array.from({length: 3}, (_, i) => randFlt(-100.0, 100.0)),
-    seraphimVertices,
-    seraphimColors,
-    seraphimTextures,
-    seraphimIndices,
-    seraphimVerticesBuffer,
-    seraphimColorsBuffer,
-    seraphimTexturesBuffer,
-    seraphimIndicesBuffer,
-    programInfo,
   };
 }
 
@@ -215,6 +190,10 @@ export function drawSmoke(
   s: SmokeV,
   brightness: number,
 ): void {
+  const {
+    seraphimBuffers: {seraphimVertices, seraphimTextures, seraphimColors},
+  } = global;
+
   let svi = 0;
   let sci = 0;
   let sti = 0;
@@ -316,37 +295,37 @@ export function drawSmoke(
           // #if 0
           if (false) {
             // /* MDT we can't use vectors in the Scalar routine */
-            // s.seraphimColors[sci++].v = cmv.v;
-            // s.seraphimColors[sci++].v = cmv.v;
-            // s.seraphimColors[sci++].v = cmv.v;
-            // s.seraphimColors[sci++].v = cmv.v;
+            // seraphimColors[sci++].v = cmv.v;
+            // seraphimColors[sci++].v = cmv.v;
+            // seraphimColors[sci++].v = cmv.v;
+            // seraphimColors[sci++].v = cmv.v;
           } else {
             for (let jj = 0; jj < 4; jj++) {
-              s.seraphimColors[sci++] = cmv0;
-              s.seraphimColors[sci++] = cmv1;
-              s.seraphimColors[sci++] = cmv2;
-              s.seraphimColors[sci++] = cmv3;
+              seraphimColors[sci++] = cmv0;
+              seraphimColors[sci++] = cmv1;
+              seraphimColors[sci++] = cmv2;
+              seraphimColors[sci++] = cmv3;
             }
           }
 
-          s.seraphimTextures[sti++] = u0;
-          s.seraphimTextures[sti++] = v0;
-          s.seraphimTextures[sti++] = u0;
-          s.seraphimTextures[sti++] = v1;
+          seraphimTextures[sti++] = u0;
+          seraphimTextures[sti++] = v0;
+          seraphimTextures[sti++] = u0;
+          seraphimTextures[sti++] = v1;
 
-          s.seraphimTextures[sti++] = u1;
-          s.seraphimTextures[sti++] = v1;
-          s.seraphimTextures[sti++] = u1;
-          s.seraphimTextures[sti++] = v0;
+          seraphimTextures[sti++] = u1;
+          seraphimTextures[sti++] = v1;
+          seraphimTextures[sti++] = u1;
+          seraphimTextures[sti++] = v0;
 
-          s.seraphimVertices[svi++] = sx + dxm - dys;
-          s.seraphimVertices[svi++] = sy + dym + dxs;
-          s.seraphimVertices[svi++] = sx + dxm + dys;
-          s.seraphimVertices[svi++] = sy + dym - dxs;
-          s.seraphimVertices[svi++] = oldscreenx - dxm + dyos;
-          s.seraphimVertices[svi++] = oldscreeny - dym - dxos;
-          s.seraphimVertices[svi++] = oldscreenx - dxm - dyos;
-          s.seraphimVertices[svi++] = oldscreeny - dym + dxos;
+          seraphimVertices[svi++] = sx + dxm - dys;
+          seraphimVertices[svi++] = sy + dym + dxs;
+          seraphimVertices[svi++] = sx + dxm + dys;
+          seraphimVertices[svi++] = sy + dym - dxs;
+          seraphimVertices[svi++] = oldscreenx - dxm + dyos;
+          seraphimVertices[svi++] = oldscreeny - dym - dxos;
+          seraphimVertices[svi++] = oldscreenx - dxm - dyos;
+          seraphimVertices[svi++] = oldscreeny - dym + dxos;
         }
       }
     }
@@ -466,9 +445,10 @@ function drawSeraphim(
   flurry: FlurryInfo,
   quads: number,
 ): void {
-  const {gl, smokeTexture} = global;
   const {
-    s: {
+    gl,
+    smokeTexture,
+    seraphimBuffers: {
       seraphimVertices,
       seraphimVerticesBuffer,
       seraphimTextures,
@@ -476,9 +456,9 @@ function drawSeraphim(
       seraphimColors,
       seraphimColorsBuffer,
       seraphimIndicesBuffer,
-      programInfo,
     },
-  } = nullthrows(flurry);
+    seraphimProgramInfo,
+  } = global;
 
   /* glDisable(gl.BLEND); */
   gl.enable(gl.BLEND);
@@ -488,32 +468,42 @@ function drawSeraphim(
 
   // Tell WebGL how to pull out the positions from the position
   // buffer into the vertexPosition attribute.
-  applyVertices(gl, programInfo, seraphimVerticesBuffer, seraphimVertices);
+  applyVertices(
+    gl,
+    seraphimProgramInfo,
+    seraphimVerticesBuffer,
+    seraphimVertices,
+  );
 
   // Tell WebGL how to pull out the positions from the position
   // buffer into the vertexPosition attribute
-  applyTextures(gl, programInfo, seraphimTexturesBuffer, seraphimTextures);
+  applyTextures(
+    gl,
+    seraphimProgramInfo,
+    seraphimTexturesBuffer,
+    seraphimTextures,
+  );
 
   // Tell WebGL how to pull out the colors from the color buffer
   // into the vertexColor attribute.
-  applyColors(gl, programInfo, seraphimColorsBuffer, seraphimColors);
+  applyColors(gl, seraphimProgramInfo, seraphimColorsBuffer, seraphimColors);
 
   // Tell WebGL which indices to use to index the vertices
   applyIndices(gl, seraphimIndicesBuffer);
 
   // Tell WebGL to use our program when drawing
 
-  gl.useProgram(programInfo.program);
+  gl.useProgram(seraphimProgramInfo.program);
 
   // Set the shader uniforms
 
   gl.uniformMatrix4fv(
-    programInfo.uniformLocations.projectionMatrix,
+    seraphimProgramInfo.uniformLocations.projectionMatrix,
     false,
     projectionMatrix,
   );
   gl.uniformMatrix4fv(
-    programInfo.uniformLocations.modelViewMatrix,
+    seraphimProgramInfo.uniformLocations.modelViewMatrix,
     false,
     modelViewMatrix,
   );
@@ -525,7 +515,7 @@ function drawSeraphim(
   gl.bindTexture(gl.TEXTURE_2D, smokeTexture);
 
   // Tell the shader we bound the texture to texture unit 0
-  gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
+  gl.uniform1i(seraphimProgramInfo.uniformLocations.uSampler, 0);
 
   {
     const vertexCount = 6 * quads;

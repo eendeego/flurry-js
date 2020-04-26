@@ -2,10 +2,12 @@
 
 // Based on https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Adding_2D_content_to_a_WebGL_context
 
+import type {SeraphimBuffers} from '../flurry/types';
+
 export function initSeraphimBuffers(
   gl: WebGLRenderingContext,
   numSmokeParticles: number,
-) {
+): SeraphimBuffers {
   // Vertices
   const seraphimVertices = new Float32Array((numSmokeParticles * 2 + 1) * 4);
   const seraphimVerticesBuffer = gl.createBuffer();
