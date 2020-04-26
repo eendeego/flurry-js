@@ -202,13 +202,13 @@ export function updateSparkColour(
   let baseGreen;
   let baseBlue;
 
-  if (flurry.currentColorMode === ColorModes.rainbowColorMode) {
+  if (flurry.currentColorMode === ColorModes.rainbow) {
     cycleTime = 1.5;
-  } else if (flurry.currentColorMode === ColorModes.tiedyeColorMode) {
+  } else if (flurry.currentColorMode === ColorModes.tiedye) {
     cycleTime = 4.5;
-  } else if (flurry.currentColorMode === ColorModes.cyclicColorMode) {
+  } else if (flurry.currentColorMode === ColorModes.cyclic) {
     cycleTime = 20.0;
-  } else if (flurry.currentColorMode === ColorModes.slowCyclicColorMode) {
+  } else if (flurry.currentColorMode === ColorModes.slowCyclic) {
     cycleTime = 120.0;
   }
   const colorRot = (2.0 * Math.PI) / cycleTime;
@@ -216,20 +216,20 @@ export function updateSparkColour(
   const greenPhaseShift = cycleTime / 3.0;
   const bluePhaseShift = (cycleTime * 2.0) / 3.0;
   let colorTime = flurry.fTime;
-  if (flurry.currentColorMode === ColorModes.whiteColorMode) {
+  if (flurry.currentColorMode === ColorModes.white) {
     baseRed = 0.1875;
     baseGreen = 0.1875;
     baseBlue = 0.1875;
-  } else if (flurry.currentColorMode === ColorModes.multiColorMode) {
+  } else if (flurry.currentColorMode === ColorModes.multi) {
     baseRed = 0.0625;
     baseGreen = 0.0625;
     baseBlue = 0.0625;
-  } else if (flurry.currentColorMode === ColorModes.darkColorMode) {
+  } else if (flurry.currentColorMode === ColorModes.dark) {
     baseRed = 0.0;
     baseGreen = 0.0;
     baseBlue = 0.0;
   } else {
-    if (flurry.currentColorMode < ColorModes.slowCyclicColorMode) {
+    if (flurry.currentColorMode < ColorModes.slowCyclic) {
       colorTime = (flurry.currentColorMode / 6.0) * cycleTime;
     } else {
       colorTime = flurry.fTime + flurry.flurryRandomSeed;
@@ -274,13 +274,13 @@ export function updateSpark(flurry: FlurryInfo, s: Spark) {
 
   let old = new Array(3);
 
-  if (flurry.currentColorMode === ColorModes.rainbowColorMode) {
+  if (flurry.currentColorMode === ColorModes.rainbow) {
     cycleTime = 1.5;
-  } else if (flurry.currentColorMode === ColorModes.tiedyeColorMode) {
+  } else if (flurry.currentColorMode === ColorModes.tiedye) {
     cycleTime = 4.5;
-  } else if (flurry.currentColorMode === ColorModes.cyclicColorMode) {
+  } else if (flurry.currentColorMode === ColorModes.cyclic) {
     cycleTime = 20.0;
-  } else if (flurry.currentColorMode === ColorModes.slowCyclicColorMode) {
+  } else if (flurry.currentColorMode === ColorModes.slowCyclic) {
     cycleTime = 120.0;
   }
   const colorRot = (2.0 * Math.PI) / cycleTime;
@@ -288,20 +288,20 @@ export function updateSpark(flurry: FlurryInfo, s: Spark) {
   const greenPhaseShift = cycleTime / 3.0;
   const bluePhaseShift = (cycleTime * 2.0) / 3.0;
   let colorTime = flurry.fTime;
-  if (flurry.currentColorMode === ColorModes.whiteColorMode) {
+  if (flurry.currentColorMode === ColorModes.white) {
     baseRed = 0.1875;
     baseGreen = 0.1875;
     baseBlue = 0.1875;
-  } else if (flurry.currentColorMode === ColorModes.multiColorMode) {
+  } else if (flurry.currentColorMode === ColorModes.multi) {
     baseRed = 0.0625;
     baseGreen = 0.0625;
     baseBlue = 0.0625;
-  } else if (flurry.currentColorMode === ColorModes.darkColorMode) {
+  } else if (flurry.currentColorMode === ColorModes.dark) {
     baseRed = 0.0;
     baseGreen = 0.0;
     baseBlue = 0.0;
   } else {
-    if (flurry.currentColorMode < ColorModes.slowCyclicColorMode) {
+    if (flurry.currentColorMode < ColorModes.slowCyclic) {
       colorTime = (flurry.currentColorMode / 6.0) * cycleTime;
     } else {
       colorTime = flurry.fTime + flurry.flurryRandomSeed;

@@ -3,19 +3,19 @@
 // @flow
 
 const ColorModes = Object.freeze({
-  redColorMode: 0,
-  magentaColorMode: 1,
-  blueColorMode: 2,
-  cyanColorMode: 3,
-  greenColorMode: 4,
-  yellowColorMode: 5,
-  slowCyclicColorMode: 6,
-  cyclicColorMode: 7,
-  tiedyeColorMode: 8,
-  rainbowColorMode: 9,
-  whiteColorMode: 10,
-  multiColorMode: 11,
-  darkColorMode: 12,
+  red: 0,
+  magenta: 1,
+  blue: 2,
+  cyan: 3,
+  green: 4,
+  yellow: 5,
+  slowCyclic: 6,
+  cyclic: 7,
+  tiedye: 8,
+  rainbow: 9,
+  white: 10,
+  multi: 11,
+  dark: 12,
 });
 
 export type ColorModesType = $Values<typeof ColorModes>;
