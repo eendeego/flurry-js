@@ -336,11 +336,11 @@ export function drawSmoke(
   }
 }
 
-function matrixes(gl: WebGLRenderingContext): [mat4, mat4] {
+function matrixes(width: number, height: number): [mat4, mat4] {
   const left = 0;
-  const right = gl.canvas.clientWidth;
+  const right = width;
   const bottom = 0;
-  const top = gl.canvas.clientHeight;
+  const top = height;
   const near = -1;
   const far = 1;
   const projectionMatrix = mat4.create();
@@ -447,6 +447,8 @@ function drawSeraphim(
 ): void {
   const {
     gl,
+    width,
+    height,
     smokeTexture,
     seraphimBuffers: {
       seraphimVertices,
@@ -464,7 +466,7 @@ function drawSeraphim(
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
-  const [projectionMatrix, modelViewMatrix] = matrixes(gl);
+  const [projectionMatrix, modelViewMatrix] = matrixes(width, height);
 
   // Tell WebGL how to pull out the positions from the position
   // buffer into the vertexPosition attribute.
