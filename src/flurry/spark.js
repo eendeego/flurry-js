@@ -8,7 +8,7 @@ import ColorModes from './color-modes';
 import {BIGMYSTERY, MAGIC, MAXANGLES} from './constants';
 import {mat4} from 'gl-matrix';
 import nullthrows from 'nullthrows';
-import {randBell, randFlt} from './random';
+import {random, randBell, randFlt} from './random';
 // import {initBuffer} from "../webgl/buffers";
 // import {initShaderProgram} from "../webgl/shaders";
 
@@ -97,7 +97,7 @@ export function drawSpark(
   }
 
   for (let k = 0; k < 12; k++) {
-    let a = Math.floor(Math.random() * 3600) / 10.0;
+    let a = Math.floor(random() * 3600) / 10.0;
     // TODO
     // gl.rotatef(a, 0.0, 0.0, 1.0);
     // gl.begin(gl.QUAD_STRIP);
@@ -105,7 +105,7 @@ export function drawSpark(
     // gl.vertex2f(-3.0, 0.0);
     spark.vertices[0] = -3.0;
     spark.vertices[1] = 0.0;
-    a = 2.0 + Math.floor(Math.random() * 256) * c;
+    a = 2.0 + Math.floor(random() * 256) * c;
     // gl.vertex2f(-3.0, a);
     spark.vertices[2] = -3.0;
     spark.vertices[3] = a;

@@ -10,6 +10,7 @@
 // @flow strict
 
 import {initTexture} from '../webgl/seraphim-textures';
+import {random} from './random';
 
 function fNum(num: number): string {
   const s = num.toString(16);
@@ -74,13 +75,13 @@ function speckleTexture(smallTextureArray: Uint8ClampedArray) {
   for (let i = 2; i < 30; i++) {
     for (let j = 2; j < 30; j++) {
       speck = 1;
-      while (speck <= 32 && Math.random() < 0.5) {
+      while (speck <= 32 && random() < 0.5) {
         t = Math.min(255, smallTextureArray[32 * i + j] + speck);
         smallTextureArray[32 * i + j] = t;
         speck += speck;
       }
       speck = 1;
-      while (speck <= 32 && Math.random() < 0.5) {
+      while (speck <= 32 && random() < 0.5) {
         t = Math.max(0, smallTextureArray[32 * i + j] - speck);
         smallTextureArray[32 * i + j] = t;
         speck += speck;

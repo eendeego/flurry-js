@@ -5,7 +5,7 @@
 import type {ProgramInfo, FlurryInfo, GlobalInfo, SmokeV} from './types';
 
 import {MAGIC, NUMSMOKEPARTICLES} from './constants';
-import {randBell, randFlt} from './random';
+import {randBell, randFlt, random} from './random';
 
 import {mat4} from 'gl-matrix';
 import Deadness from './deadness';
@@ -107,7 +107,7 @@ export function updateSmoke(
         s.p[s.nextParticle].time[s.nextSubParticle] = flurry.fTime;
         s.p[s.nextParticle].dead[s.nextSubParticle] = Deadness.alive;
         s.p[s.nextParticle].animFrame[s.nextSubParticle] = Math.floor(
-          Math.random() * 64,
+          random() * 64,
         );
         s.nextSubParticle++;
         if (s.nextSubParticle === 4) {

@@ -57,7 +57,7 @@ export function resetFlurries(
 ): GlobalInfo {
   // For a later day
   // if (preset === Presets.RANDOM) {
-  //   return ((Math.round(Math.random() * Presets.MAX): any): PresetsType);
+  //   return ((Math.round(random() * Presets.MAX): any): PresetsType);
   // }
 
   return {
