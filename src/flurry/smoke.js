@@ -133,17 +133,23 @@ export function updateSmoke(
   const frameRate = flurry.dframe / flurry.fTime;
   const frameRateModifier = 42.5 / frameRate;
 
+  // For every particle
   for (let i = 0; i < NUMSMOKEPARTICLES / 4; i++) {
+    // For every subparticle
     for (let k = 0; k < 4; k++) {
+      // If it is alive
       if (s.p[i].dead[k] !== Deadness.alive) {
         continue;
       }
 
+      // Initialize deltas
       let deltax = s.p[i].delta[0 * 4 + k];
       let deltay = s.p[i].delta[1 * 4 + k];
       let deltaz = s.p[i].delta[2 * 4 + k];
 
+      // For every stream
       for (let j = 0; j < flurry.numStreams; j++) {
+        // Distance to spark ^ 2
         const dx = s.p[i].position[0 * 4 + k] - flurry.spark[j].position[0];
         const dy = s.p[i].position[1 * 4 + k] - flurry.spark[j].position[1];
         const dz = s.p[i].position[2 * 4 + k] - flurry.spark[j].position[2];
@@ -166,6 +172,7 @@ export function updateSmoke(
       deltay *= flurry.drag;
       deltaz *= flurry.drag;
 
+      // If delta > 5000, kill particle
       if (deltax * deltax + deltay * deltay + deltaz * deltaz >= 25000000.0) {
         s.p[i].dead[k] = Deadness.dead;
         continue;
@@ -177,6 +184,7 @@ export function updateSmoke(
       s.p[i].delta[2 * 4 + k] = deltaz;
       for (let j = 0; j < 3; j++) {
         s.p[i].oldposition[j * 4 + k] = s.p[i].position[j * 4 + k];
+        // Update all positions by delta * deltaTime
         s.p[i].position[j * 4 + k] +=
           s.p[i].delta[j * 4 + k] * flurry.fDeltaTime;
       }
@@ -204,8 +212,11 @@ export function drawSmoke(
 
   const width = (MAGIC.streamSize + 2.5 * flurry.streamExpansion) * screenRatio;
 
+  // For every particle
   for (let i = 0; i < NUMSMOKEPARTICLES / 4; i++) {
+    // For every subparticle
     for (let k = 0; k < 4; k++) {
+      // If it is alive
       if (s.p[i].dead[k] !== Deadness.alive) {
         continue;
       }
@@ -214,14 +225,15 @@ export function drawSmoke(
         (MAGIC.streamSize +
           (flurry.fTime - s.p[i].time[k]) * flurry.streamExpansion) *
         screenRatio;
+      // If it went off-screen, kill it
       if (thisWidth >= width) {
         s.p[i].dead[k] = Deadness.dead;
         continue;
       }
-      const z = s.p[i].position[2 * 3 + k];
-      const sx = (s.p[i].position[0 * 3 + k] * global.width) / z + wslash2;
-      const sy = (s.p[i].position[1 * 3 + k] * global.width) / z + hslash2;
-      const oldz = s.p[i].oldposition[2 * 3 + k];
+      const z = s.p[i].position[2 * 4 + k];
+      const sx = (s.p[i].position[0 * 4 + k] * global.width) / z + wslash2;
+      const sy = (s.p[i].position[1 * 4 + k] * global.width) / z + hslash2;
+      const oldz = s.p[i].oldposition[2 * 4 + k];
       if (
         sx > global.width + 50.0 ||
         sx < -50.0 ||
@@ -238,8 +250,8 @@ export function drawSmoke(
 
       const w = Math.max(1.0, thisWidth / z);
       {
-        const oldx = s.p[i].oldposition[0 * 3 + k];
-        const oldy = s.p[i].oldposition[1 * 3 + k];
+        const oldx = s.p[i].oldposition[0 * 4 + k];
+        const oldy = s.p[i].oldposition[1 * 4 + k];
         const oldscreenx = (oldx * global.width) / oldz + wslash2;
         const oldscreeny = (oldy * global.width) / oldz + hslash2;
         const dx = sx - oldscreenx;
