@@ -160,7 +160,7 @@ function averageLastAndFirstTextures(
   }
 }
 
-export function makeTexture(gl: WebGLRenderingContext): WebGLTexture {
+export function createTexture(gl: WebGLRenderingContext): WebGLTexture {
   const smallTextureArray = new Uint8ClampedArray(32 * 32);
   const bigTextureArray = new Uint8ClampedArray(256 * 256 * 2);
 

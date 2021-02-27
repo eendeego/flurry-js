@@ -7,7 +7,7 @@ import type {PresetsType} from './presets';
 
 import {NUMSMOKEPARTICLES} from './constants';
 import {flurriesFromPreset} from './presets';
-import {makeTexture} from './texture';
+import {createTexture} from './texture';
 import {bootstrapWebGL, configureWebGL} from '../webgl/global';
 import {initSeraphimBuffers} from '../webgl/seraphim-buffers';
 import {initShaders} from '../webgl/seraphim-shaders';
@@ -41,7 +41,7 @@ export function boostrapGlobal(
     flurries: flurriesFromPreset(preset, 0),
     seraphimProgramInfo,
     seraphimBuffers,
-    smokeTexture: makeTexture(gl),
+    smokeTexture: createTexture(gl),
   };
 }
 

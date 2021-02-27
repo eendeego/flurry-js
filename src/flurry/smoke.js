@@ -23,7 +23,7 @@ function fastDistance2D(x: number, y: number): number {
   return xx + yy - mn * 0.5 - mn * 0.25 + mn * 0.0625;
 }
 
-export function initSmoke(): SmokeV {
+export function createSmoke(): SmokeV {
   return {
     p: Array.from({length: NUMSMOKEPARTICLES / 4}, (_, i) => ({
       color: new Float32Array(4 * 4),

@@ -6,7 +6,7 @@ import type {FlurryInfo, GlobalInfo, Star} from './types';
 import {BIGMYSTERY, MAGIC, MAXANGLES} from './constants';
 import {randFlt} from './random';
 
-export function initStar(rotSpeed?: number): Star {
+export function createStar(rotSpeed?: number): Star {
   return {
     position: Array.from({length: 3}, (_, i) => randFlt(-10000.0, 10000.0)),
     mystery: randFlt(0.0, 10.0),

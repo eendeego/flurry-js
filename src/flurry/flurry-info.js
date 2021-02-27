@@ -6,9 +6,9 @@ import type {ColorModesType} from './color-modes';
 import type {FlurryInfo} from './types';
 import {randFlt} from './random';
 
-import {initSmoke} from './smoke';
-import {initSpark, updateSpark} from './spark';
-import {initStar} from './star';
+import {createSmoke} from './smoke';
+import {createSpark, updateSpark} from './spark';
+import {createStar} from './star';
 import {MAX_SPARKS, NUMSMOKEPARTICLES} from './constants';
 
 export function deleteFlurryInfo(flurry: FlurryInfo): void {
@@ -34,7 +34,7 @@ export function createFlurry(
   const dframe = 0;
   const fTime = seed + flurryRandomSeed;
 
-  const smoke = initSmoke();
+  const smoke = createSmoke();
   for (let i = 0; i < NUMSMOKEPARTICLES / 4; i++) {
     for (let k = 0; k < 4; k++) {
       smoke.p[i].dead[k] = 1;
@@ -44,14 +44,12 @@ export function createFlurry(
   const flurry = {
     currentColorMode: colour,
     s: smoke,
-    star: initStar(speed),
-    //   star->rotSpeed:speed,
-    spark: Array.from({length: MAX_SPARKS}, (_, i) => {
-      const spark = initSpark();
-      spark.mystery =
-        (1800 * (i + 1)) / 13; /* 100 * (i + 1) / (flurry->numStreams + 1); */
-      return spark;
-    }),
+    star: createStar(speed),
+    spark: Array.from({length: MAX_SPARKS}, (_, i) => ({
+      ...createSpark(),
+      mystery:
+        (1800 * (i + 1)) / 13 /* 100 * (i + 1) / (flurry->numStreams + 1); */,
+    })),
     streamExpansion: thickness,
     numStreams: streams,
     flurryRandomSeed,

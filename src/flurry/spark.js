@@ -12,7 +12,7 @@ import {random, randBell, randFlt} from './random';
 // import {initBuffer} from "../webgl/buffers";
 // import {initShaderProgram} from "../webgl/shaders";
 
-export function initSpark(): Spark {
+export function createSpark(): Spark {
   return {
     position: Array.from({length: 4}, (_, i) => randFlt(-100.0, 100.0)),
     mystery: 0,
