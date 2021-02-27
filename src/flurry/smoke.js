@@ -304,20 +304,11 @@ export function drawSmoke(
           const cmv2 = s.p[i].color[2 * 4 + k] * cm;
           const cmv3 = s.p[i].color[3 * 4 + k] * cm;
 
-          // #if 0
-          if (false) {
-            // /* MDT we can't use vectors in the Scalar routine */
-            // seraphimColors[sci++].v = cmv.v;
-            // seraphimColors[sci++].v = cmv.v;
-            // seraphimColors[sci++].v = cmv.v;
-            // seraphimColors[sci++].v = cmv.v;
-          } else {
-            for (let jj = 0; jj < 4; jj++) {
-              seraphimColors[sci++] = cmv0;
-              seraphimColors[sci++] = cmv1;
-              seraphimColors[sci++] = cmv2;
-              seraphimColors[sci++] = cmv3;
-            }
+          for (let jj = 0; jj < 4; jj++) {
+            seraphimColors[sci++] = cmv0;
+            seraphimColors[sci++] = cmv1;
+            seraphimColors[sci++] = cmv2;
+            seraphimColors[sci++] = cmv3;
           }
 
           seraphimTextures[sti++] = u0;
