@@ -15,7 +15,11 @@
   font-size: 12px;
   flex-direction: row;
   justify-content: flex-end;
+  left: 0;
   margin: 12px;
+  position: fixed;
+  right: 0;
+  top: 0;
 }
 
 .Controls-size {

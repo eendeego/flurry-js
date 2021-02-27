@@ -45,10 +45,14 @@ export function boostrapGlobal(
   };
 }
 
-export function resizeGlobal(global: GlobalInfo): GlobalInfo {
+export function resizeGlobal(
+  global: GlobalInfo,
+  width: number,
+  height: number,
+): GlobalInfo {
   return {
     ...global,
-    width: global.gl.canvas.clientWidth,
-    height: global.gl.canvas.clientHeight,
+    width,
+    height,
   };
 }

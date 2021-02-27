@@ -3,17 +3,19 @@ import './App.css';
 import {resetFlurries, renderScene} from './flurry';
 import {DEF_PRESET} from './flurry/constants';
 import {boostrapGlobal, resizeGlobal} from './flurry/global';
-import {resize} from './webgl/global';
+import {resizeViewport} from './webgl/global';
 import {Presets} from './flurry/presets';
+import {useWindowSize} from '@react-hook/window-size';
 
 function App() {
+  const [width, height] = useWindowSize();
+
   const canvasRef = useRef();
   const canvas = canvasRef.current;
 
   const globalRef = useRef();
 
   const [preset, setPreset] = useState(DEF_PRESET);
-  const [size, setSize] = useState('medium');
 
   useEffect(() => {
     // Initialization
@@ -41,9 +43,9 @@ function App() {
   }, []);
 
   useEffect(() => {
-    globalRef.current = resizeGlobal(globalRef.current);
-    resize(globalRef.current.gl);
-  }, [size]);
+    globalRef.current = resizeGlobal(globalRef.current, width, height);
+    resizeViewport(globalRef.current.gl, width, height);
+  }, [width, height]);
 
   useEffect(() => {
     globalRef.current = resetFlurries(globalRef.current, preset);
@@ -67,21 +69,13 @@ function App() {
             <option value={Presets.INSANE}>Insane</option>
           </select>
         </label>
-        <button
-          className="Controls-size"
-          onClick={() => {
-            setSize(size === 'medium' ? 'small' : 'medium');
-          }}
-        >
-          Toggle size [{size}]
-        </button>
       </div>
       <div className="Flurry">
         <canvas
           className="Flurry-canvas"
           ref={canvasRef}
-          width={size === 'medium' ? 640 : 320}
-          height={size === 'medium' ? 480 : 240}
+          width={width}
+          height={height}
         />
       </div>
     </div>

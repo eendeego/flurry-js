@@ -44,7 +44,11 @@ export function configureWebGL(
   return gl;
 }
 
-export function resize(gl: WebGLRenderingContext): void {
-  gl.viewport(0.0, 0.0, gl.canvas.clientWidth, gl.canvas.clientHeight);
+export function resizeViewport(
+  gl: WebGLRenderingContext,
+  width: number,
+  height: number,
+): void {
+  gl.viewport(0.0, 0.0, width, height);
   gl.clear(gl.COLOR_BUFFER_BIT);
 }

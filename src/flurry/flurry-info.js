@@ -9,7 +9,7 @@ import {randFlt} from './random';
 import {createSmoke} from './smoke';
 import {createSpark, updateSpark} from './spark';
 import {createStar} from './star';
-import {MAX_SPARKS, NUMSMOKEPARTICLES} from './constants';
+import {MAX_SPARKS} from './constants';
 
 export function deleteFlurryInfo(flurry: FlurryInfo): void {
   // flurry.s = null;
