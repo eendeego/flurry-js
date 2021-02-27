@@ -30,7 +30,7 @@ export function createSmoke(): SmokeV {
       position: new Float32Array(3 * 4),
       oldposition: new Float32Array(3 * 4),
       delta: new Float32Array(3 * 4),
-      dead: new Uint32Array(4).fill(Deadness.alive),
+      dead: new Uint32Array(4).fill(Deadness.dead),
       time: new Float32Array(4),
       animFrame: new Uint32Array(4),
     })),

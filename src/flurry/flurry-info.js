@@ -35,11 +35,6 @@ export function createFlurry(
   const fTime = seed + flurryRandomSeed;
 
   const smoke = createSmoke();
-  for (let i = 0; i < NUMSMOKEPARTICLES / 4; i++) {
-    for (let k = 0; k < 4; k++) {
-      smoke.p[i].dead[k] = 1;
-    }
-  }
 
   const flurry = {
     currentColorMode: colour,
