@@ -2,7 +2,7 @@
 
 // @flow
 
-import type {FlurryInfo, GlobalInfo, SmokeV} from './types';
+import type {FlurryInfo, GlobalInfo, Smoke} from './types';
 
 import {MAGIC, NUMSMOKEPARTICLES} from './constants';
 import {randBell, randFlt, random} from './random';
@@ -23,7 +23,7 @@ function fastDistance2D(x: number, y: number): number {
   return xx + yy - mn * 0.5 - mn * 0.25 + mn * 0.0625;
 }
 
-export function createSmoke(): SmokeV {
+export function createSmoke(): Smoke {
   return {
     p: Array.from({length: NUMSMOKEPARTICLES / 4}, (_, i) => ({
       color: new Float32Array(4 * 4),
@@ -46,7 +46,7 @@ export function createSmoke(): SmokeV {
 export function updateSmoke(
   global: GlobalInfo,
   flurry: FlurryInfo,
-  s: SmokeV,
+  s: Smoke,
 ): void {
   const sx = flurry.star.position[0];
   const sy = flurry.star.position[1];
@@ -195,7 +195,7 @@ export function updateSmoke(
 export function drawSmoke(
   global: GlobalInfo,
   flurry: FlurryInfo,
-  s: SmokeV,
+  s: Smoke,
   brightness: number,
 ): void {
   const {

@@ -16,7 +16,7 @@ export type ProgramInfo = {
   },
 };
 
-export type SmokeParticleV = {
+export type SmokeParticle = {
   color: Float32Array, // floatToVector[4];
   position: Float32Array, // floatToVector[3];
   oldposition: Float32Array, // floatToVector[3];
@@ -26,8 +26,8 @@ export type SmokeParticleV = {
   animFrame: Uint32Array, // intToVector;
 };
 
-export type SmokeV = {
-  p: Array<SmokeParticleV>, // [NUMSMOKEPARTICLES/4];
+export type Smoke = {
+  p: Array<SmokeParticle>, // [NUMSMOKEPARTICLES/4];
   nextParticle: number,
   nextSubParticle: number,
   lastParticleTime: number,
@@ -52,7 +52,7 @@ export type Spark = {|
 
 export type FlurryInfo = {|
   currentColorMode: ColorModesType,
-  s: SmokeV,
+  s: Smoke,
   star: Star,
   spark: Array<Spark>,
   streamExpansion: number,
