@@ -38,3 +38,11 @@
   background-color: black;
   box-shadow: 0 22px 70px 4px rgba(0, 0, 0, 0.56);
 }
+
+.Knobs {
+  color: white;
+  display: flex;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+}
