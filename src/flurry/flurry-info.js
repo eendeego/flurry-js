@@ -11,16 +11,6 @@ import {createSpark, updateSpark} from './spark';
 import {createStar} from './star';
 import {MAX_SPARKS} from './constants';
 
-export function deleteFlurryInfo(flurry: FlurryInfo): void {
-  // flurry.s = null;
-  // flurry.star = null;
-  // for (let i = 0; i < flurry.spark.length; i++) {
-  //   flurry.spark[i] = null;
-  // }
-  // flurry.spark = null;
-  /* free(flurry); */
-}
-
 export function createFlurry(
   smokeParameters: SmokeParameters,
   seed: number,
