@@ -4,7 +4,7 @@ import {Presets} from './presets';
 
 export const NUMSMOKEPARTICLES = 3600;
 
-export const MAGIC = {
+export const DEFAULT_SMOKE_PARAMETERS = {
   gravity: 1500000.0,
 
   incohesion: 0.07,

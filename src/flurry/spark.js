@@ -5,7 +5,7 @@
 import type {FlurryInfo, GlobalInfo, Spark} from './types';
 
 import ColorModes from './color-modes';
-import {BIGMYSTERY, MAGIC, MAXANGLES} from './constants';
+import {BIGMYSTERY, MAXANGLES} from './constants';
 import {mat4} from 'gl-matrix';
 import nullthrows from 'nullthrows';
 import {random, randBell, randFlt} from './random';
@@ -26,7 +26,7 @@ export function drawSpark(
   flurry: FlurryInfo,
   s: Spark,
 ): void {
-  const gl = global.gl;
+  const {gl} = global;
   const spark = nullthrows(global.debug?.spark);
   const modelViewMatrix = mat4.create();
   const projectionMatrix = mat4.create();
@@ -195,7 +195,10 @@ export function updateSparkColour(
   flurry: FlurryInfo,
   s: Spark,
 ): void {
-  const rotationsPerSecond = (2.0 * Math.PI * MAGIC.fieldSpeed) / MAXANGLES;
+  const {smokeParameters} = global;
+
+  const rotationsPerSecond =
+    (2.0 * Math.PI * smokeParameters.fieldSpeed) / MAXANGLES;
   const thisAngle = flurry.fTime * rotationsPerSecond;
   let cycleTime = 20.0;
   let baseRed;
@@ -264,8 +267,13 @@ export function updateSparkColour(
     0.0625 * (0.5 + Math.cos(37.0 * (thisPointInRadians + thisAngle)));
 }
 
-export function updateSpark(flurry: FlurryInfo, s: Spark) {
-  const rotationsPerSecond = (2.0 * Math.PI * MAGIC.fieldSpeed) / MAXANGLES;
+export function updateSpark(
+  smokeParameters: SmokeParameters,
+  flurry: FlurryInfo,
+  s: Spark,
+) {
+  const rotationsPerSecond =
+    (2.0 * Math.PI * smokeParameters.fieldSpeed) / MAXANGLES;
   const thisAngle = flurry.fTime * rotationsPerSecond;
   let cycleTime = 20.0;
   let baseRed;
@@ -340,15 +348,16 @@ export function updateSpark(flurry: FlurryInfo, s: Spark) {
     0.0625 * (0.5 + Math.cos(37.0 * (thisPointInRadians + thisAngle)));
 
   s.position[0] =
-    MAGIC.fieldRange *
+    smokeParameters.fieldRange *
     cf *
     Math.cos(11.0 * (thisPointInRadians + 3.0 * thisAngle));
   s.position[1] =
-    MAGIC.fieldRange *
+    smokeParameters.fieldRange *
     cf *
     Math.sin(12.0 * (thisPointInRadians + 4.0 * thisAngle));
   s.position[2] =
-    MAGIC.fieldRange * Math.cos(23.0 * (thisPointInRadians + 12.0 * thisAngle));
+    smokeParameters.fieldRange *
+    Math.cos(23.0 * (thisPointInRadians + 12.0 * thisAngle));
 
   let rotation = thisAngle * 0.501 + (5.01 * s.mystery) / BIGMYSTERY;
   let cr = Math.cos(rotation);
@@ -364,7 +373,7 @@ export function updateSpark(flurry: FlurryInfo, s: Spark) {
 
   const tmpX3 = tmpX2;
   const tmpY3 = tmpY2 * cr - tmpZ2 * sr;
-  const tmpZ3 = tmpZ2 * cr + tmpY2 * sr + MAGIC.seraphDistance;
+  const tmpZ3 = tmpZ2 * cr + tmpY2 * sr + smokeParameters.seraphDistance;
 
   rotation = thisAngle * 2.501 + (85.01 * s.mystery) / BIGMYSTERY;
   cr = Math.cos(rotation);
@@ -373,9 +382,9 @@ export function updateSpark(flurry: FlurryInfo, s: Spark) {
   const tmpY4 = tmpY3 * cr + tmpX3 * sr;
   const tmpZ4 = tmpZ3;
 
-  s.position[0] = tmpX4 + randBell(5.0 * MAGIC.fieldCoherence);
-  s.position[1] = tmpY4 + randBell(5.0 * MAGIC.fieldCoherence);
-  s.position[2] = tmpZ4 + randBell(5.0 * MAGIC.fieldCoherence);
+  s.position[0] = tmpX4 + randBell(5.0 * smokeParameters.fieldCoherence);
+  s.position[1] = tmpY4 + randBell(5.0 * smokeParameters.fieldCoherence);
+  s.position[2] = tmpZ4 + randBell(5.0 * smokeParameters.fieldCoherence);
 
   for (let i = 0; i < 3; i++) {
     s.delta[i] = (s.position[i] - old[i]) / flurry.fDeltaTime;

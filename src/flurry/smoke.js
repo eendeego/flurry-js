@@ -4,7 +4,7 @@
 
 import type {FlurryInfo, GlobalInfo, Smoke} from './types';
 
-import {MAGIC, NUMSMOKEPARTICLES} from './constants';
+import {NUMSMOKEPARTICLES} from './constants';
 import {randBell, randFlt, random} from './random';
 
 import Deadness from './deadness';
@@ -48,6 +48,8 @@ export function updateSmoke(
   flurry: FlurryInfo,
   s: Smoke,
 ): void {
+  const {smokeParameters} = global;
+
   const sx = flurry.star.position[0];
   const sy = flurry.star.position[1];
   const sz = flurry.star.position[2];
@@ -76,7 +78,7 @@ export function updateSmoke(
         s.p[s.nextParticle].oldposition[2 * 4 + s.nextSubParticle] = sz;
         const streamSpeedCoherenceFactor = Math.max(
           0.0,
-          1.0 + randBell(0.25 * MAGIC.incohesion),
+          1.0 + randBell(0.25 * smokeParameters.incohesion),
         );
         const dx =
           s.p[s.nextParticle].position[0 * 4 + s.nextSubParticle] -
@@ -87,7 +89,7 @@ export function updateSmoke(
         const dz =
           s.p[s.nextParticle].position[2 * 4 + s.nextSubParticle] -
           flurry.spark[i].position[2];
-        const f = MAGIC.streamSpeed * streamSpeedCoherenceFactor;
+        const f = smokeParameters.streamSpeed * streamSpeedCoherenceFactor;
 
         const mag = f / Math.hypot(dx, dy, dz);
 
@@ -96,13 +98,16 @@ export function updateSmoke(
         s.p[s.nextParticle].delta[2 * 4 + s.nextSubParticle] -= dz * mag;
 
         s.p[s.nextParticle].color[0 * 4 + s.nextSubParticle] =
-          flurry.spark[i].color[0] * (1.0 + randBell(MAGIC.colorIncoherence));
+          flurry.spark[i].color[0] *
+          (1.0 + randBell(smokeParameters.colorIncoherence));
         s.p[s.nextParticle].color[1 * 4 + s.nextSubParticle] =
-          flurry.spark[i].color[1] * (1.0 + randBell(MAGIC.colorIncoherence));
+          flurry.spark[i].color[1] *
+          (1.0 + randBell(smokeParameters.colorIncoherence));
         s.p[s.nextParticle].color[2 * 4 + s.nextSubParticle] =
-          flurry.spark[i].color[2] * (1.0 + randBell(MAGIC.colorIncoherence));
+          flurry.spark[i].color[2] *
+          (1.0 + randBell(smokeParameters.colorIncoherence));
         s.p[s.nextParticle].color[3 * 4 + s.nextSubParticle] =
-          0.85 * (1.0 + randBell(0.5 * MAGIC.colorIncoherence));
+          0.85 * (1.0 + randBell(0.5 * smokeParameters.colorIncoherence));
 
         s.p[s.nextParticle].time[s.nextSubParticle] = flurry.fTime;
         s.p[s.nextParticle].dead[s.nextSubParticle] = Deadness.alive;
@@ -155,10 +160,10 @@ export function updateSmoke(
         const dz = s.p[i].position[2 * 4 + k] - flurry.spark[j].position[2];
         const rsquared = dx * dx + dy * dy + dz * dz;
 
-        let f = (MAGIC.gravity / rsquared) * frameRateModifier;
+        let f = (smokeParameters.gravity / rsquared) * frameRateModifier;
 
         if ((i * 4 + k) % flurry.numStreams === j) {
-          f *= 1.0 + MAGIC.streamBias;
+          f *= 1.0 + smokeParameters.streamBias;
         }
         const mag = f / Math.sqrt(rsquared);
 
@@ -200,6 +205,7 @@ export function drawSmoke(
 ): void {
   const {
     seraphimBuffers: {seraphimVertices, seraphimTextures, seraphimColors},
+    smokeParameters,
   } = global;
 
   let svi = 0;
@@ -210,7 +216,8 @@ export function drawSmoke(
   const hslash2 = global.height * 0.5;
   const wslash2 = global.width * 0.5;
 
-  const width = (MAGIC.streamSize + 2.5 * flurry.streamExpansion) * screenRatio;
+  const width =
+    (smokeParameters.streamSize + 2.5 * flurry.streamExpansion) * screenRatio;
 
   // For every particle
   for (let i = 0; i < NUMSMOKEPARTICLES / 4; i++) {
@@ -222,7 +229,7 @@ export function drawSmoke(
       }
 
       const thisWidth =
-        (MAGIC.streamSize +
+        (smokeParameters.streamSize +
           (flurry.fTime - s.p[i].time[k]) * flurry.streamExpansion) *
         screenRatio;
       // If it went off-screen, kill it

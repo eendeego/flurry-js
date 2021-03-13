@@ -77,6 +77,19 @@ export type SeraphimBuffers = {|
   seraphimIndicesBuffer: WebGLBuffer,
 |};
 
+export type SmokeParameters = {
+  gravity: number,
+  incohesion: number,
+  colorIncoherence: number,
+  streamSpeed: number,
+  fieldCoherence: number,
+  fieldSpeed: number,
+  seraphDistance: number,
+  streamSize: number,
+  fieldRange: number,
+  streamBias: number,
+};
+
 export type GlobalInfo = {|
   /* system values */
   gl: WebGLRenderingContext,
@@ -87,6 +100,8 @@ export type GlobalInfo = {|
   timeInSecondsSinceStart: number,
   frameCounter: number,
   oldFrameTime: number,
+
+  smokeParameters: $ReadOnly<SmokeParameters>,
 
   flurries: $ReadOnlyArray<FlurryInfo>,
   seraphimProgramInfo: ProgramInfo,

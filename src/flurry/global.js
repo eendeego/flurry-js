@@ -5,7 +5,7 @@
 import type {GlobalInfo} from './types';
 import type {PresetsType} from './presets';
 
-import {NUMSMOKEPARTICLES} from './constants';
+import {NUMSMOKEPARTICLES, DEFAULT_SMOKE_PARAMETERS} from './constants';
 import {flurriesFromPreset} from './presets';
 import {createTexture} from './texture';
 import {bootstrapWebGL, configureWebGL} from '../webgl/global';
@@ -38,7 +38,9 @@ export function boostrapGlobal(
     frameCounter: 0,
     oldFrameTime: -1,
 
-    flurries: flurriesFromPreset(preset, 0),
+    smokeParameters: {...DEFAULT_SMOKE_PARAMETERS},
+
+    flurries: flurriesFromPreset(DEFAULT_SMOKE_PARAMETERS, preset, 0),
     seraphimProgramInfo,
     seraphimBuffers,
     smokeTexture: createTexture(gl),

@@ -17,6 +17,8 @@ export function currentTime(): number {
 }
 
 function drawFlurry(global: GlobalInfo, flurry: FlurryInfo, b: number): void {
+  const {smokeParameters} = global;
+
   flurry.dframe++;
 
   flurry.fOldTime = flurry.fTime;
@@ -39,7 +41,7 @@ function drawFlurry(global: GlobalInfo, flurry: FlurryInfo, b: number): void {
     flurry.spark[i].color[0] = 1.0;
     flurry.spark[i].color[1] = 1.0;
     flurry.spark[i].color[2] = 1.0;
-    updateSpark(flurry, flurry.spark[i]);
+    updateSpark(smokeParameters, flurry, flurry.spark[i]);
 
     // #ifdef DRAW_SPARKS
     if (DRAW_SPARKS) {
@@ -64,7 +66,11 @@ export function resetFlurries(
     ...global,
     startTime: currentTime(),
     oldFrameTime: -1,
-    flurries: flurriesFromPreset(preset, global.timeInSecondsSinceStart),
+    flurries: flurriesFromPreset(
+      global.smokeParameters,
+      preset,
+      global.timeInSecondsSinceStart,
+    ),
   };
 }
 

@@ -3,7 +3,7 @@
 // @flow
 
 import type {ColorModesType} from './color-modes';
-import type {FlurryInfo} from './types';
+import type {FlurryInfo, SmokeParameters} from './types';
 import {randFlt} from './random';
 
 import {createSmoke} from './smoke';
@@ -22,6 +22,7 @@ export function deleteFlurryInfo(flurry: FlurryInfo): void {
 }
 
 export function createFlurry(
+  smokeParameters: SmokeParameters,
   seed: number,
   streams: number,
   colour: ColorModesType,
@@ -56,7 +57,7 @@ export function createFlurry(
     dframe,
   };
 
-  flurry.spark.forEach((spark) => updateSpark(flurry, spark));
+  flurry.spark.forEach((spark) => updateSpark(smokeParameters, flurry, spark));
 
   return flurry;
 }

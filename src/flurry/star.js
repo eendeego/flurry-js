@@ -3,7 +3,7 @@
 // @flow
 
 import type {FlurryInfo, GlobalInfo, Star} from './types';
-import {BIGMYSTERY, MAGIC, MAXANGLES} from './constants';
+import {BIGMYSTERY, MAXANGLES} from './constants';
 import {randFlt} from './random';
 
 export function createStar(rotSpeed?: number): Star {
@@ -20,6 +20,8 @@ export function updateStar(
   flurry: FlurryInfo,
   s: Star,
 ): void {
+  const {smokeParameters} = global;
+
   const rotationsPerSecond =
     ((2.0 * Math.PI * 12.0) / MAXANGLES) * s.rotSpeed; /* speed control */
   let thisPointInRadians;
@@ -63,7 +65,7 @@ export function updateStar(
 
   tmpX3 = tmpX2;
   tmpY3 = tmpY2 * cr - tmpZ2 * sr;
-  tmpZ3 = tmpZ2 * cr + tmpY2 * sr + MAGIC.seraphDistance;
+  tmpZ3 = tmpZ2 * cr + tmpY2 * sr + smokeParameters.seraphDistance;
 
   rotation = thisAngle * 2.501 + (85.01 * s.mystery) / BIGMYSTERY;
   cr = Math.cos(rotation);
